@@ -28,6 +28,7 @@ import type { default as _NotificationsEp } from '../src/api/notifications';
 import type { default as _NotifyPrefsEp } from '../src/api/notifyPrefs';
 import type { default as _ProposalFormEp } from '../src/api/proposalForm';
 import type { default as _ReminderRulesEp } from '../src/api/reminderRules';
+import type { default as _ReportThesesEp } from '../src/api/reportTheses';
 import type { default as _ReportsEp } from '../src/api/reports';
 import type { default as _RequestExtensionEp } from '../src/api/requestExtension';
 import type { default as _RequestSupervisorEp } from '../src/api/requestSupervisor';
@@ -172,6 +173,11 @@ export type ReminderRulesInputType = NonNullable<_ReminderRulesCfg['inputSchema'
 export type ReminderRulesOutputType = Awaited<ReturnType<_ReminderRulesCfg['execute']>>;
 export const reminderRules = createCaller<ReminderRulesInputType, ReminderRulesOutputType>('reminderRules');
 
+type _ReportThesesCfg = typeof _ReportThesesEp;
+export type ReportThesesInputType = NonNullable<_ReportThesesCfg['inputSchema']> extends { _input: infer I } ? I : Parameters<_ReportThesesCfg['execute']>[0]['input'];
+export type ReportThesesOutputType = Awaited<ReturnType<_ReportThesesCfg['execute']>>;
+export const reportTheses = createCaller<ReportThesesInputType, ReportThesesOutputType>('reportTheses');
+
 type _ReportsCfg = typeof _ReportsEp;
 export type ReportsInputType = NonNullable<_ReportsCfg['inputSchema']> extends { _input: infer I } ? I : Parameters<_ReportsCfg['execute']>[0]['input'];
 export type ReportsOutputType = Awaited<ReturnType<_ReportsCfg['execute']>>;
@@ -265,6 +271,7 @@ export const api = {
   notifyPrefs,
   proposalForm,
   reminderRules,
+  reportTheses,
   reports,
   requestExtension,
   requestSupervisor,

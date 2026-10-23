@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-# Scheduled jobs (replacement for platform schedules). Needs an admin session token in SHOMAL_ADMIN_TOKEN.
-# crontab:  0 7 * * * /opt/shomaldoc/server/deploy/cron.sh reminders
-#           0 3 1 * * /opt/shomaldoc/server/deploy/cron.sh term
+# Manual run only — the server already schedules these jobs internally with node-cron.
+# Usage: sudo -u shomaldoc /opt/shomaldoc/server/deploy/cron.sh reminders|term
 set -euo pipefail
-EP=$([ "${1:-}" = term ] && echo runTermControl || echo runReminders)
-curl -fsS -XPOST "http://127.0.0.1:3000/api/$EP" -H 'content-type: application/json' -d "{\"token\":\"$SHOMAL_ADMIN_TOKEN\",\"dryRun\":false}"
+cd "$(dirname "$0")/.."
+set -a; [ -f .env ] && . ./.env; set +a
+EP=$([ "${1:-reminders}" = term ] && echo runTermControl || echo runReminders)
+exec npx tsx --tsconfig tsconfig.json src/index.ts run-job "$EP"

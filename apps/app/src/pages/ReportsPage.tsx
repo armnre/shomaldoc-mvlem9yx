@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@project/components/ui
 import { Skeleton } from '@project/components/ui/skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@project/components/ui/table';
 import StatsPanel from '../components/StatsPanel';
+import ThesisReport from '../components/ThesisReport';
 import { useSession } from '../lib/session';
 import { errMsg, fa } from '../lib/format';
 
@@ -41,6 +42,7 @@ export default function ReportsPage() {
         <Kpi label="درخواست‌های تمدید (تأییدشده)" value={`${fa(k.extensions)} (${fa(k.extensionsApproved)})`} />
         <Kpi label="نیازمند تمدید / کمیسیون" value={fa(k.overdue)} />
       </div>
+      <ThesisReport scope={scope} />
       <StatsPanel scope={scope} />
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>

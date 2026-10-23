@@ -22,7 +22,27 @@ export function unauthorized(msg = 'نشست شما منقضی شده است. ل
 const enc = new TextEncoder();
 const b64 = (b: ArrayBuffer | Uint8Array) => btoa(String.fromCharCode(...new Uint8Array(b)));
 const unb64 = (s: string) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
-const ITER = 100_000;
+// Self-hosted server sets 600k (OWASP 2023). The Zite worker's WebCrypto caps PBKDF2 at 100k.
+const HOOKS = globalThis as unknown as {
+  __shomalPbkdf2Iter?: number;
+  __shomalInternalKey?: string;
+  __shomalWithProfileLock?: <T>(profileId: string, fn: () => Promise<T>) => Promise<T>;
+};
+const ITER = HOOKS.__shomalPbkdf2Iter ?? 100_000;
+/** True when a stored hash uses fewer iterations than the current target. */
+export function needsRehash(stored?: string) {
+  const parts = (stored ?? '').split('$');
+  return parts[0] === 'pbkdf2' && Number(parts[1]) < (HOOKS.__shomalPbkdf2Iter ?? 100_000);
+}
+/** Serialises work per professor. On the self-hosted server this is SELECT ... FOR UPDATE on the profile row. */
+export function withProfileLock<T>(profileId: string, fn: () => Promise<T>): Promise<T> {
+  return HOOKS.__shomalWithProfileLock ? HOOKS.__shomalWithProfileLock(profileId, fn) : fn();
+}
+/** Scheduled jobs on the self-hosted server pass a per-boot random key instead of a user session. */
+export function isInternalCall(token: string) {
+  return !!HOOKS.__shomalInternalKey && token === HOOKS.__shomalInternalKey;
+}
+export const SYSTEM_ACTOR = { id: 'system', roles: ['admin'], fullName: 'سامانه (زمان‌بندی خودکار)' } as unknown as ProfilesRecordType;
 
 async function pbkdf2(pw: string, salt: Uint8Array, iter: number) {
   const key = await crypto.subtle.importKey('raw', enc.encode(pw), 'PBKDF2', false, ['deriveBits']);

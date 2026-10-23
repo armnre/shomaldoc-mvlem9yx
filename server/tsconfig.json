@@ -6,16 +6,38 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "strict": false,
+    "strict": true,
     "strictNullChecks": true,
     "noEmit": true,
     "baseUrl": ".",
     "paths": {
-      "zitejs/db": ["../.zite/db.ts"],
-      "zitejs/runtime": ["./src/shims/runtime.ts"],
-      "zitejs/backend": ["./src/shims/backend.ts"],
-      "zitejs/pdf": ["./src/shims/pdf.ts"]
-    }
+      "zitejs/db": [
+        "../.zite/db.ts"
+      ],
+      "zitejs/runtime": [
+        "./src/shims/runtime.ts"
+      ],
+      "zitejs/backend": [
+        "./src/shims/backend.ts"
+      ],
+      "zitejs/pdf": [
+        "./src/shims/pdf.ts"
+      ],
+      "zod": [
+        "../node_modules/zod"
+      ]
+    },
+    "types": [
+      "node"
+    ]
   },
-  "include": ["src", "../apps/app/src/api", "../apps/app/src/lib/server.ts"]
+  "include": [
+    "src",
+    "scripts",
+    "test",
+    "../apps/app/src/api",
+    "../apps/app/src/lib/server.ts",
+    "../apps/app/src/lib/jalali.ts",
+    "../apps/app/src/lib/logoData.ts"
+  ]
 }

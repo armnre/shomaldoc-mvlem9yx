@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { createEndpoint, ZiteError } from 'zitejs/backend';
 import { zite } from 'zitejs/db';
-import { audit, hashPassword, intSetting, newToken, SESSION_HOURS, sha256, verifyPassword } from '../lib/server';
+import { audit, hashPassword, intSetting, needsRehash, newToken, SESSION_HOURS, sha256, verifyPassword } from '../lib/server';
 
 const GENERIC = 'نام کاربری یا رمز عبور نادرست است.';
 function fail(msg: string): never {
@@ -42,7 +42,13 @@ export default createEndpoint({
         lastSeenAt: new Date().toISOString(), userAgent: (input.userAgent ?? '').slice(0, 200), ipAddress: null, revoked: false,
       },
     });
-    if (p.failedLogins || p.lockedUntil) await zite.profiles.update({ id: p.id, record: { failedLogins: 0, lockedUntil: null } });
+    if (p.failedLogins || p.lockedUntil || needsRehash(p.passwordHash)) {
+      // Transparent upgrade of old hashes to the current iteration count after a successful login.
+      await zite.profiles.update({
+        id: p.id,
+        record: { failedLogins: 0, lockedUntil: null, ...(needsRehash(p.passwordHash) ? { passwordHash: await hashPassword(input.password) } : {}) },
+      });
+    }
     await audit({ action: 'ورود به سامانه', actor: p.id, role: 'security' });
     return { token, mustChangePassword: !!p.mustChangePassword };
   },

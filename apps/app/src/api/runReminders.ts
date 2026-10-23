@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { createEndpoint } from 'zitejs/backend';
 import { zite, type ThesesRecordType } from 'zitejs/db';
-import { audit, first, notifyT, requireAuth, STATUS_FA } from '../lib/server';
+import { audit, first, notifyT, requireAuth, isInternalCall, SYSTEM_ACTOR, STATUS_FA } from '../lib/server';
 
 const DAY = 86_400_000;
 const STUDENT_STATUSES = ['DRAFT', 'SUPERVISOR_REJECTED', 'TOPIC_REVISION', 'LITERATURE_REVIEW', 'LITERATURE_REVISION', 'PROPOSAL_DRAFT', 'PROPOSAL_REVISION', 'IRANDOC_PENDING', 'EXTENSION_REQUIRED', 'FINAL_REVISION'];
@@ -44,7 +44,7 @@ export default createEndpoint({
     events: z.array(z.object({ code: z.string(), status: z.string(), days: z.number(), stage: z.string(), recipients: z.number(), duplicate: z.boolean() })),
   }),
   execute: async ({ input }) => {
-    const p = await requireAuth(input.token, ['admin', 'graduate_office']);
+    const p = isInternalCall(input.token) ? SYSTEM_ACTOR : await requireAuth(input.token, ['admin', 'graduate_office']);
     const { records: rules } = await zite.reminderRules.findAll({ filters: { isActive: true }, limit: 200 });
     const events: { code: string; status: string; days: number; stage: string; recipients: number; duplicate: boolean }[] = [];
     for (const rule of rules) {

@@ -74,7 +74,7 @@ export default function LoginScreen({ onSignedIn }: { onSignedIn: () => void }) 
             ))}
           </ul>
         </div>
-        <p className="relative text-xs opacity-60">معاونت آموزشی و تحصیلات تکمیلی دانشگاه شمال</p>
+        <div className="relative space-y-1 text-xs opacity-70"><p>© ۱۴۰۵ دانشگاه شمال، معاونت پژوهش و فناوری — کلیه حقوق محفوظ است.</p><p>طراحی و توسعه: پارامیس تک</p></div>
       </aside>
       <main className="flex items-center justify-center bg-background p-6">
         <form onSubmit={submit} className="w-full max-w-sm space-y-6">

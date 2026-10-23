@@ -1,13 +1,21 @@
 [Unit]
-Description=ShomalDoc thesis management API
+Description=ShomalDoc thesis management (Node.js + PostgreSQL)
 After=network.target postgresql.service
+Wants=postgresql.service
 
 [Service]
 WorkingDirectory=/opt/shomaldoc/server
 EnvironmentFile=/opt/shomaldoc/server/.env
 ExecStart=/usr/bin/npm start
 Restart=always
+RestartSec=5
 User=shomaldoc
+Group=shomaldoc
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ReadWritePaths=/var/lib/shomaldoc /opt/shomaldoc/server
+ProtectHome=true
 
 [Install]
 WantedBy=multi-user.target

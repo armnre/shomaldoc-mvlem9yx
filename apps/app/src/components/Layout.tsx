@@ -67,7 +67,7 @@ function SidebarBody({ items, onPick }: { items: Item[]; onPick?: () => void }) 
         ) : <div className="mt-1 text-xs text-sidebar-primary">{ROLE_LABELS[role] ?? role}</div>}
       </div>
       <div className="flex-1 overflow-y-auto"><NavList items={items} onPick={onPick} /></div>
-      <div className="text-[10px] text-sidebar-foreground/50">© دانشگاه شمال · معاونت آموزشی و تحصیلات تکمیلی</div>
+      <div className="space-y-0.5 text-[10px] leading-relaxed text-sidebar-foreground/50"><div>© ۱۴۰۵ دانشگاه شمال، معاونت پژوهش و فناوری — کلیه حقوق محفوظ است.</div><div>طراحی و توسعه: پارامیس تک</div></div>
     </div>
   );
 }

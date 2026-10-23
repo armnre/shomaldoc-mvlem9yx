@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { createEndpoint } from 'zitejs/backend';
 import { zite } from 'zitejs/db';
-import { audit, requireAuth } from '../lib/server';
+import { audit, requireAuth, isInternalCall, SYSTEM_ACTOR } from '../lib/server';
 
 const COUNTED = ['THESIS_ACTIVE', 'EXTENSION_REQUIRED', 'EXTENSION_REQUESTED', 'SPECIAL_COMMISSION'];
 
@@ -14,7 +14,7 @@ export default createEndpoint({
     flagged: z.array(z.object({ code: z.string(), termsUsed: z.number(), allowedTerms: z.number() })),
   }),
   execute: async ({ input }) => {
-    const p = await requireAuth(input.token, ['admin', 'graduate_office']);
+    const p = isInternalCall(input.token) ? SYSTEM_ACTOR : await requireAuth(input.token, ['admin', 'graduate_office']);
     const today = new Date().toISOString().slice(0, 10);
     const { records: terms } = await zite.academicTerms.findAll({ filters: { processed: false }, limit: 200 });
     const due = terms.filter((t) => t.endDate && t.endDate < today).sort((a, b) => (a.endDate ?? '').localeCompare(b.endDate ?? ''));

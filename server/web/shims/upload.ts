@@ -8,7 +8,9 @@ export function useUpload() {
     try {
       const fd = new FormData();
       fd.append('file', file, filename ?? (file as File).name ?? 'file');
-      const res = await fetch('/api/_upload', { method: 'POST', body: fd });
+      const KEY = 'shomaldoc-session';
+      const token = sessionStorage.getItem(KEY) ?? localStorage.getItem(KEY) ?? '';
+      const res = await fetch('/api/_upload', { method: 'POST', body: fd, credentials: 'same-origin', headers: token ? { 'x-session-token': token } : {} });
       const body = await res.json().catch(() => null);
       if (!res.ok) throw new Error(body?.userFacingMessage ?? 'بارگذاری فایل ناموفق بود.');
       return { url: body.url as string };
