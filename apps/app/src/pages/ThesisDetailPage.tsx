@@ -7,6 +7,7 @@ import { Skeleton } from '@project/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@project/components/ui/card';
 import { CaseHeader, ProcessCards, Timeline, Versions } from '../components/CaseFile';
 import ActionPanel from '../components/ActionPanel';
+import { DefenseChangesCard, GraduationPanel, LockedBanner, TopicChangesCard } from '../components/CaseExtras';
 import { DefenseCard, ReviewForm } from '../components/DefenseCard';
 import { errMsg } from '../lib/format';
 
@@ -30,9 +31,13 @@ export default function ThesisDetailPage() {
         <ArrowRight className="h-4 w-4" /> بازگشت به فهرست
       </Link>
       <CaseHeader t={t} />
+      <LockedBanner t={t} />
       <ActionPanel thesisId={t.id} departmentId={t.departmentId} supervisorId={t.supervisorId} actions={d.allowedActions} onDone={load} />
       {(() => { const mine = d.reviews.find((r) => r.mine && r.verdict === 'pending'); return mine && t.status === 'REVIEWING' ? <ReviewForm reviewId={mine.id} onDone={load} /> : null; })()}
       <DefenseCard d={d} />
+      <GraduationPanel thesisId={t.id} status={t.status} onChange={load} />
+      <TopicChangesCard items={d.topicChanges} />
+      <DefenseChangesCard items={d.defenseChanges} />
       <ProcessCards d={d} />
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
@@ -41,6 +46,7 @@ export default function ThesisDetailPage() {
             <CardContent className="space-y-4 text-sm leading-7">
               <p className="whitespace-pre-wrap">{t.problemStatement || '—'}</p>
               <p className="whitespace-pre-wrap">{t.objectives || '—'}</p>
+              {t.programName && <p className="text-muted-foreground">رشته/گرایش: {t.programName}</p>}
             </CardContent>
           </Card>
           <Versions versions={d.versions} />

@@ -8,10 +8,13 @@ import { errMsg, fa, jalali, STEP_LABELS } from '../../lib/format';
 import { DefenseCard } from '../../components/DefenseCard';
 import { CaseHeader, ProcessCards, Timeline, Versions } from '../../components/CaseFile';
 import TopicForm from './TopicForm';
+import StudentJourney from '../../components/StudentJourney';
 import SupervisorPicker from './SupervisorPicker';
 import DocumentSubmit from './DocumentSubmit';
 import IranDocForm from './IranDocForm';
 import ExtensionForm from './ExtensionForm';
+import TopicChangeForm from './TopicChangeForm';
+import { DefenseChangesCard, GraduationPanel, LockedBanner, TopicChangesCard } from '../../components/CaseExtras';
 
 const Notice = ({ icon: Icon, title, text, tone = 'text-primary' }: { icon: typeof Info; title: string; text: string; tone?: string }) => (
   <Card><CardContent className="flex items-start gap-3 p-6"><Icon className={`mt-0.5 h-6 w-6 shrink-0 ${tone}`} />
@@ -55,6 +58,7 @@ export default function StudentHome() {
   return (
     <div className="space-y-6">
       {t && <CaseHeader t={t} />}
+      <StudentJourney status={s} />
       {['NONE', 'DRAFT', 'SUPERVISOR_REJECTED'].includes(s) && (
         <div className="grid gap-6 lg:grid-cols-2">
           <TopicForm thesis={t} onSaved={load} />
@@ -78,10 +82,16 @@ export default function StudentHome() {
           text={`ترم ${fa(t.termsUsed)} از ${fa(t.allowedTerms)} ترم مجاز. پس از تکمیل نگارش، نسخهٔ نهایی را از فرم زیر ارسال کنید.`} />
       )}
       {['THESIS_ACTIVE', 'FINAL_REVISION'].includes(s) && <DocumentSubmit kind="final" lastComment={s === 'FINAL_REVISION' ? (active('final')?.reviewComment || 'لطفاً بر اساس نظرات داوران/همانندجویی، نسخهٔ اصلاح‌شده را ارسال کنید.') : undefined} onDone={load} />}
+      {d.topicChangeAllowed && t && <TopicChangeForm currentTitle={t.titleFa} onDone={load} />}
       {s === 'DEFENDED' && t && <Notice icon={Award} title="تبریک! دفاع شما با موفقیت ثبت شد" text={`نمره: ${fa(t.defenseScore ?? 0)} — درجه: ${t.defenseGrade}. صورتجلسه از بخش «جلسهٔ دفاع» قابل دریافت است.`} />}
+      {s === 'THESIS_COMPLETED' && <Notice icon={Hourglass} title="پایان‌نامه تکمیل شد" text="تحصیلات تکمیلی به‌زودی فرآیند فارغ‌التحصیلی را آغاز می‌کند." />}
+      {t && <LockedBanner t={t} />}
+      {t && <GraduationPanel thesisId={t.id} status={s} onChange={load} />}
       {['REJECTED', 'CANCELLED'].includes(s) && <Notice icon={XCircle} tone="text-destructive" title="پرونده بسته شده است" text="جزئیات و علت در تاریخچهٔ پرونده ثبت شده است." />}
       {t && <DefenseCard d={d} />}
       {t && <ProcessCards d={d} />}
+      {t && <TopicChangesCard items={d.topicChanges} />}
+      {t && <DefenseChangesCard items={d.defenseChanges} />}
       {t && (
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2"><Versions versions={d.versions} /></div>

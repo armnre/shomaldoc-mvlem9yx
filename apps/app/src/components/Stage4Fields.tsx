@@ -5,7 +5,7 @@ import { Input } from '@project/components/ui/input';
 import { Label } from '@project/components/ui/label';
 import { Checkbox } from '@project/components/ui/checkbox';
 import { Badge } from '@project/components/ui/badge';
-import { DateTimePicker } from '@project/components/ui/date-picker';
+import JalaliDatePicker from './JalaliDatePicker';
 import { useSession } from '../lib/session';
 import { errMsg } from '../lib/format';
 
@@ -15,14 +15,15 @@ export type Stage4Values = {
   defenseDate?: Date;
   defenseLocation: string;
   score: string;
+  gapException: boolean;
 };
-export const EMPTY_STAGE4: Stage4Values = { similarity: '', reviewers: [], defenseLocation: '', score: '' };
+export const EMPTY_STAGE4: Stage4Values = { similarity: '', reviewers: [], defenseLocation: '', score: '', gapException: false };
 
 export function stage4Valid(action: string, v: Stage4Values) {
   const num = (s: string, max: number) => s.trim() !== '' && Number(s) >= 0 && Number(s) <= max;
   if (action.startsWith('plagiarism_')) return num(v.similarity, 100);
   if (action === 'assign_reviewers') return v.reviewers.length > 0;
-  if (action === 'schedule_defense') return !!v.defenseDate && v.defenseLocation.trim().length > 1;
+  if (action === 'schedule_defense' || action === 'reschedule_defense') return !!v.defenseDate && v.defenseLocation.trim().length > 1;
   if (action === 'record_defense') return num(v.score, 20);
   return true;
 }
@@ -37,11 +38,15 @@ export default function Stage4Fields({ action, thesisId, v, set }: { action: str
       </div>
     );
   if (action === 'assign_reviewers') return <ReviewerPicker thesisId={thesisId} v={v} set={set} />;
-  if (action === 'schedule_defense')
+  if (action === 'schedule_defense' || action === 'reschedule_defense')
     return (
       <div className="space-y-3">
-        <div className="space-y-2"><Label>تاریخ و ساعت دفاع</Label><DateTimePicker value={v.defenseDate} onChange={(d) => set({ ...v, defenseDate: d })} /></div>
+        <div className="space-y-2"><Label>تاریخ و ساعت دفاع</Label><JalaliDatePicker withTime min={new Date()} value={v.defenseDate} onChange={(d) => set({ ...v, defenseDate: d })} /></div>
         <div className="space-y-2"><Label htmlFor="loc">محل برگزاری</Label><Input id="loc" value={v.defenseLocation} onChange={(e) => set({ ...v, defenseLocation: e.target.value })} placeholder="مثلاً: سالن جلسات دانشکده" /></div>
+        <label className="flex items-start gap-2 rounded-md border border-dashed p-2 text-xs text-muted-foreground">
+          <Checkbox checked={v.gapException} onCheckedChange={(c) => set({ ...v, gapException: !!c })} />
+          <span>استثنای حداقل فاصلهٔ تصویب پروپوزال تا دفاع (فقط تحصیلات تکمیلی/مدیر سیستم؛ شرح مجوز در توضیحات الزامی است و در رویدادها ثبت می‌شود)</span>
+        </label>
       </div>
     );
   if (action === 'record_defense')

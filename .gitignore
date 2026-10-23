@@ -1,3 +1,6 @@
 node_modules
 dist
-.zite
+.env.local
+.tsbuildinfo
+__zite__*
+.npmrc

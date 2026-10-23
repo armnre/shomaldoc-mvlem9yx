@@ -7,8 +7,9 @@ const COUNTED = ['THESIS_ACTIVE', 'EXTENSION_REQUIRED', 'EXTENSION_REQUESTED', '
 
 export default createEndpoint({
   description: 'End-of-term control: for each ended, unprocessed term, counts a term on active theses and flags those needing extension',
-  inputSchema: z.object({ token: z.string() }),
+  inputSchema: z.object({ token: z.string(), dryRun: z.boolean().default(false) }),
   outputSchema: z.object({
+    dryRun: z.boolean(),
     processedTerms: z.array(z.string()),
     flagged: z.array(z.object({ code: z.string(), termsUsed: z.number(), allowedTerms: z.number() })),
   }),
@@ -26,15 +27,17 @@ export default createEndpoint({
         const used = (t.termsUsed ?? 0) + 1;
         const allowed = t.allowedTerms ?? 0;
         const needs = t.status === 'THESIS_ACTIVE' && used >= allowed;
+        if (needs) flagged.push({ code: t.thesisCode ?? '', termsUsed: used, allowedTerms: allowed });
+        if (input.dryRun) continue;
         await zite.theses.update({ id: t.id, record: { termsUsed: used, ...(needs ? { status: 'EXTENSION_REQUIRED' } : {}) } });
         if (needs) {
-          flagged.push({ code: t.thesisCode ?? '', termsUsed: used, allowedTerms: allowed });
           await audit({ action: 'کنترل پایان ترم: نیازمند تمدید', actor: p.id, role: 'system', thesisId: t.id, from: t.status, to: 'EXTENSION_REQUIRED', comment: `${term.name} — ترم ${used} از ${allowed}` });
         }
       }
+      if (input.dryRun) continue;
       await zite.academicTerms.update({ id: term.id, record: { processed: true, processedAt: new Date().toISOString() } });
       await audit({ action: 'اجرای کنترل پایان ترم', actor: p.id, role: 'system', comment: term.name ?? '' });
     }
-    return { processedTerms: due.map((t) => t.name ?? ''), flagged };
+    return { dryRun: input.dryRun, processedTerms: due.map((t) => t.name ?? ''), flagged };
   },
 });

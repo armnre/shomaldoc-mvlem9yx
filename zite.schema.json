@@ -74,6 +74,34 @@
               "inverseFieldId": "f3y7FAccyLp"
             }
           }
+        },
+        {
+          "id": "fnNWE7KvnGE",
+          "sdkName": "programs1",
+          "definition": {
+            "name": "Programs (1)",
+            "type": "linked_record",
+            "template": {
+              "tableId": "tt3VHD2jet7",
+              "isInverse": true,
+              "allowMultiple": true,
+              "inverseFieldId": "faxZyuYTUfv"
+            }
+          }
+        },
+        {
+          "id": "fsEX2uBdRDP",
+          "sdkName": "facultyRef",
+          "definition": {
+            "name": "Faculty Ref",
+            "type": "linked_record",
+            "template": {
+              "tableId": "tcviuRA12zD",
+              "isInverse": false,
+              "allowMultiple": true,
+              "inverseFieldId": "f6TLGzVc8Wc"
+            }
+          }
         }
       ]
     },
@@ -319,6 +347,58 @@
             "type": "checkbox",
             "template": {}
           }
+        },
+        {
+          "id": "fqKvyWnrAcM",
+          "sdkName": "program",
+          "definition": {
+            "name": "Program",
+            "type": "linked_record",
+            "template": {
+              "tableId": "tt3VHD2jet7",
+              "isInverse": false,
+              "allowMultiple": true,
+              "inverseFieldId": "fakmhYXnmkP"
+            }
+          }
+        },
+        {
+          "id": "ftnsFj5wnTj",
+          "sdkName": "email",
+          "definition": {
+            "name": "Email",
+            "type": "email",
+            "template": {}
+          }
+        },
+        {
+          "id": "fjXpBm9Ke3n",
+          "sdkName": "phone",
+          "definition": {
+            "name": "Phone",
+            "type": "phone_number",
+            "template": {}
+          }
+        },
+        {
+          "id": "fohQgfqBuUU",
+          "sdkName": "notifyEmail",
+          "definition": {
+            "name": "Notify Email",
+            "type": "checkbox",
+            "template": {
+              "defaultValue": true
+            }
+          }
+        },
+        {
+          "id": "frVuqeQjsGz",
+          "sdkName": "notifySms",
+          "definition": {
+            "name": "Notify Sms",
+            "type": "checkbox",
+            "template": {}
+          }
         }
       ]
     },
@@ -548,6 +628,21 @@
                   "value": "pLKR",
                   "label": "DEFENDED",
                   "color": "sky"
+                },
+                {
+                  "value": "3SCE",
+                  "label": "THESIS_COMPLETED",
+                  "color": "teal"
+                },
+                {
+                  "value": "jaiW",
+                  "label": "GRADUATION_PROCESS",
+                  "color": "indigo"
+                },
+                {
+                  "value": "5W9K",
+                  "label": "GRADUATED",
+                  "color": "cyan"
                 }
               ],
               "disableColors": false
@@ -861,6 +956,108 @@
               "isInverse": true,
               "allowMultiple": true,
               "inverseFieldId": "fpLVLqWs1Ks"
+            }
+          }
+        },
+        {
+          "id": "foeJ68iD3LA",
+          "sdkName": "program",
+          "definition": {
+            "name": "Program",
+            "type": "linked_record",
+            "template": {
+              "tableId": "tt3VHD2jet7",
+              "isInverse": false,
+              "allowMultiple": true,
+              "inverseFieldId": "f8QMVbE3KjL"
+            }
+          }
+        },
+        {
+          "id": "fsx927PuaYX",
+          "sdkName": "formAnswers",
+          "definition": {
+            "name": "Form Answers",
+            "type": "long_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "fwqceK7SBFT",
+          "sdkName": "isLocked",
+          "definition": {
+            "name": "Is Locked",
+            "type": "checkbox",
+            "template": {}
+          }
+        },
+        {
+          "id": "fckfoj8zgq8",
+          "sdkName": "completedAt",
+          "definition": {
+            "name": "Completed At",
+            "type": "datetime",
+            "template": {
+              "timezone": "",
+              "dateFormat": "local",
+              "timeFormat": "12h",
+              "displayTimeZone": false
+            }
+          }
+        },
+        {
+          "id": "fhg1pRD93Jv",
+          "sdkName": "graduatedAt",
+          "definition": {
+            "name": "Graduated At",
+            "type": "datetime",
+            "template": {
+              "timezone": "",
+              "dateFormat": "local",
+              "timeFormat": "12h",
+              "displayTimeZone": false
+            }
+          }
+        },
+        {
+          "id": "fiL23Z9A7iG",
+          "sdkName": "topicChanges",
+          "definition": {
+            "name": "Topic Changes",
+            "type": "linked_record",
+            "template": {
+              "tableId": "th7kuHqN8ex",
+              "isInverse": true,
+              "allowMultiple": true,
+              "inverseFieldId": "fctrLDhvfCf"
+            }
+          }
+        },
+        {
+          "id": "f9xV6vjSteK",
+          "sdkName": "defenseChanges",
+          "definition": {
+            "name": "Defense Changes",
+            "type": "linked_record",
+            "template": {
+              "tableId": "teRxyCh4EJb",
+              "isInverse": true,
+              "allowMultiple": true,
+              "inverseFieldId": "fmJjb8x2Fgz"
+            }
+          }
+        },
+        {
+          "id": "forfYscKRi6",
+          "sdkName": "graduationItems",
+          "definition": {
+            "name": "Graduation Items",
+            "type": "linked_record",
+            "template": {
+              "tableId": "txfkzXfvAYu",
+              "isInverse": true,
+              "allowMultiple": true,
+              "inverseFieldId": "f5y7njjMJ8u"
             }
           }
         }
@@ -1908,6 +2105,1102 @@
         },
         {
           "id": "fvSJuJuqh7z",
+          "sdkName": "created",
+          "definition": {
+            "name": "Created",
+            "type": "created_at",
+            "template": {
+              "timezone": "",
+              "dateFormat": "local",
+              "timeFormat": "12h",
+              "displayTimeZone": false
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "tcviuRA12zD",
+      "sdkName": "faculties",
+      "name": "Faculties",
+      "primaryFieldId": "f4RP8Sz9aJS",
+      "fields": [
+        {
+          "id": "f4RP8Sz9aJS",
+          "sdkName": "name",
+          "definition": {
+            "name": "Name",
+            "type": "single_line_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "ff4Ar8i9BPR",
+          "sdkName": "code",
+          "definition": {
+            "name": "Code",
+            "type": "single_line_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "f6TLGzVc8Wc",
+          "sdkName": "departments",
+          "definition": {
+            "name": "Departments",
+            "type": "linked_record",
+            "template": {
+              "tableId": "t5ySfCgnzYJ",
+              "isInverse": true,
+              "allowMultiple": true,
+              "inverseFieldId": "fsEX2uBdRDP"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "tt3VHD2jet7",
+      "sdkName": "programs",
+      "name": "Programs",
+      "primaryFieldId": "fc18ReGARy5",
+      "fields": [
+        {
+          "id": "fc18ReGARy5",
+          "sdkName": "name",
+          "definition": {
+            "name": "Name",
+            "type": "single_line_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "f6aLhRkLsED",
+          "sdkName": "specialization",
+          "definition": {
+            "name": "Specialization",
+            "type": "single_line_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "fkWEkNfgByP",
+          "sdkName": "degree",
+          "definition": {
+            "name": "Degree",
+            "type": "single_select",
+            "template": {
+              "options": [
+                {
+                  "value": "vfMs",
+                  "label": "کارشناسی ارشد",
+                  "color": "purple"
+                },
+                {
+                  "value": "7wT3",
+                  "label": "دکتری",
+                  "color": "orange"
+                }
+              ],
+              "disableColors": false
+            }
+          }
+        },
+        {
+          "id": "faxZyuYTUfv",
+          "sdkName": "department",
+          "definition": {
+            "name": "Department",
+            "type": "linked_record",
+            "template": {
+              "tableId": "t5ySfCgnzYJ",
+              "isInverse": false,
+              "allowMultiple": true,
+              "inverseFieldId": "fnNWE7KvnGE"
+            }
+          }
+        },
+        {
+          "id": "fiLTq7nMciF",
+          "sdkName": "isActive",
+          "definition": {
+            "name": "Is Active",
+            "type": "checkbox",
+            "template": {
+              "defaultValue": true
+            }
+          }
+        },
+        {
+          "id": "fakmhYXnmkP",
+          "sdkName": "profiles",
+          "definition": {
+            "name": "Profiles",
+            "type": "linked_record",
+            "template": {
+              "tableId": "trGJPye5BJG",
+              "isInverse": true,
+              "allowMultiple": true,
+              "inverseFieldId": "fqKvyWnrAcM"
+            }
+          }
+        },
+        {
+          "id": "f8QMVbE3KjL",
+          "sdkName": "theses",
+          "definition": {
+            "name": "Theses",
+            "type": "linked_record",
+            "template": {
+              "tableId": "teoe1GgDtsZ",
+              "isInverse": true,
+              "allowMultiple": true,
+              "inverseFieldId": "foeJ68iD3LA"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "tja24vEC9d9",
+      "sdkName": "dynamicForms",
+      "name": "Dynamic Forms",
+      "primaryFieldId": "fp4kpkA2vnu",
+      "fields": [
+        {
+          "id": "fp4kpkA2vnu",
+          "sdkName": "name",
+          "definition": {
+            "name": "Name",
+            "type": "single_line_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "f5qmRLa119f",
+          "sdkName": "kind",
+          "definition": {
+            "name": "Kind",
+            "type": "single_select",
+            "template": {
+              "options": [
+                {
+                  "value": "qibB",
+                  "label": "proposal",
+                  "color": "purple"
+                }
+              ],
+              "disableColors": false
+            }
+          }
+        },
+        {
+          "id": "fnBJDhNtTSg",
+          "sdkName": "isActive",
+          "definition": {
+            "name": "Is Active",
+            "type": "checkbox",
+            "template": {
+              "defaultValue": true
+            }
+          }
+        },
+        {
+          "id": "fq6eumf8tm4",
+          "sdkName": "formFields",
+          "definition": {
+            "name": "Form Fields",
+            "type": "linked_record",
+            "template": {
+              "tableId": "ttc9r9JJTsd",
+              "isInverse": true,
+              "allowMultiple": true,
+              "inverseFieldId": "fj26oT1bqZY"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "ttc9r9JJTsd",
+      "sdkName": "formFields",
+      "name": "Form Fields",
+      "primaryFieldId": "f7ZaZj2dwww",
+      "fields": [
+        {
+          "id": "f7ZaZj2dwww",
+          "sdkName": "label",
+          "definition": {
+            "name": "Label",
+            "type": "single_line_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "fj26oT1bqZY",
+          "sdkName": "form",
+          "definition": {
+            "name": "Form",
+            "type": "linked_record",
+            "template": {
+              "tableId": "tja24vEC9d9",
+              "isInverse": false,
+              "allowMultiple": true,
+              "inverseFieldId": "fq6eumf8tm4"
+            }
+          }
+        },
+        {
+          "id": "ftbP94pdGTF",
+          "sdkName": "fieldKey",
+          "definition": {
+            "name": "Field Key",
+            "type": "single_line_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "fnFcNdyWG5N",
+          "sdkName": "fieldType",
+          "definition": {
+            "name": "Field Type",
+            "type": "single_select",
+            "template": {
+              "options": [
+                {
+                  "value": "jjqs",
+                  "label": "text",
+                  "color": "purple"
+                },
+                {
+                  "value": "tzAs",
+                  "label": "textarea",
+                  "color": "orange"
+                },
+                {
+                  "value": "cLwu",
+                  "label": "number",
+                  "color": "blue"
+                },
+                {
+                  "value": "5ccW",
+                  "label": "select",
+                  "color": "gray"
+                },
+                {
+                  "value": "nkeX",
+                  "label": "date",
+                  "color": "red"
+                }
+              ],
+              "disableColors": false
+            }
+          }
+        },
+        {
+          "id": "feP7eci6mGq",
+          "sdkName": "required",
+          "definition": {
+            "name": "Required",
+            "type": "checkbox",
+            "template": {}
+          }
+        },
+        {
+          "id": "frahHoNjeCS",
+          "sdkName": "sortOrder",
+          "definition": {
+            "name": "Sort Order",
+            "type": "number",
+            "template": {
+              "numberFormat": "local",
+              "decimalPlaces": 1
+            }
+          }
+        },
+        {
+          "id": "fuoJnQyKRuK",
+          "sdkName": "options",
+          "definition": {
+            "name": "Options",
+            "type": "long_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "fm1gwENsoFY",
+          "sdkName": "minLength",
+          "definition": {
+            "name": "Min Length",
+            "type": "number",
+            "template": {
+              "numberFormat": "local",
+              "decimalPlaces": 1
+            }
+          }
+        },
+        {
+          "id": "f9fXAKsK7ah",
+          "sdkName": "maxLength",
+          "definition": {
+            "name": "Max Length",
+            "type": "number",
+            "template": {
+              "numberFormat": "local",
+              "decimalPlaces": 1
+            }
+          }
+        },
+        {
+          "id": "f11p5Q1RRnK",
+          "sdkName": "helpText",
+          "definition": {
+            "name": "Help Text",
+            "type": "single_line_text",
+            "template": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "th7kuHqN8ex",
+      "sdkName": "topicChanges",
+      "name": "Topic Changes",
+      "primaryFieldId": "ftg1mCR231h",
+      "fields": [
+        {
+          "id": "ftg1mCR231h",
+          "sdkName": "label",
+          "definition": {
+            "name": "Label",
+            "type": "single_line_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "fctrLDhvfCf",
+          "sdkName": "thesis",
+          "definition": {
+            "name": "Thesis",
+            "type": "linked_record",
+            "template": {
+              "tableId": "teoe1GgDtsZ",
+              "isInverse": false,
+              "allowMultiple": true,
+              "inverseFieldId": "fiL23Z9A7iG"
+            }
+          }
+        },
+        {
+          "id": "fw1ZjkF9iWa",
+          "sdkName": "oldTitle",
+          "definition": {
+            "name": "Old Title",
+            "type": "single_line_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "f5nM3tH8BZ9",
+          "sdkName": "newTitle",
+          "definition": {
+            "name": "New Title",
+            "type": "single_line_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "f1bHmzTyqsa",
+          "sdkName": "newTitleEn",
+          "definition": {
+            "name": "New Title En",
+            "type": "single_line_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "fmJVTujjK84",
+          "sdkName": "reason",
+          "definition": {
+            "name": "Reason",
+            "type": "long_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "fmoMQkRRw5B",
+          "sdkName": "files",
+          "definition": {
+            "name": "Files",
+            "type": "attachments",
+            "template": {}
+          }
+        },
+        {
+          "id": "fgfukaUwemY",
+          "sdkName": "changeStatus",
+          "definition": {
+            "name": "Change Status",
+            "type": "single_select",
+            "template": {
+              "options": [
+                {
+                  "value": "wxLm",
+                  "label": "supervisor_review",
+                  "color": "purple"
+                },
+                {
+                  "value": "6wsw",
+                  "label": "group_review",
+                  "color": "orange"
+                },
+                {
+                  "value": "jshv",
+                  "label": "approved",
+                  "color": "blue"
+                },
+                {
+                  "value": "2x8Q",
+                  "label": "rejected",
+                  "color": "gray"
+                }
+              ],
+              "disableColors": false
+            }
+          }
+        },
+        {
+          "id": "fmqStYEsj7A",
+          "sdkName": "prevStatus",
+          "definition": {
+            "name": "Prev Status",
+            "type": "single_line_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "fbuZqZ8cjq9",
+          "sdkName": "decisions",
+          "definition": {
+            "name": "Decisions",
+            "type": "long_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "fhKj7BNyV67",
+          "sdkName": "requestedById",
+          "definition": {
+            "name": "Requested By Id",
+            "type": "single_line_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "fiRAv8mZVd8",
+          "sdkName": "created",
+          "definition": {
+            "name": "Created",
+            "type": "created_at",
+            "template": {
+              "timezone": "",
+              "dateFormat": "local",
+              "timeFormat": "12h",
+              "displayTimeZone": false
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "teRxyCh4EJb",
+      "sdkName": "defenseChanges",
+      "name": "Defense Changes",
+      "primaryFieldId": "fjhgeyDgKpj",
+      "fields": [
+        {
+          "id": "fjhgeyDgKpj",
+          "sdkName": "label",
+          "definition": {
+            "name": "Label",
+            "type": "single_line_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "fmJjb8x2Fgz",
+          "sdkName": "thesis",
+          "definition": {
+            "name": "Thesis",
+            "type": "linked_record",
+            "template": {
+              "tableId": "teoe1GgDtsZ",
+              "isInverse": false,
+              "allowMultiple": true,
+              "inverseFieldId": "f9xV6vjSteK"
+            }
+          }
+        },
+        {
+          "id": "ffZ1Mt9m5ht",
+          "sdkName": "oldDate",
+          "definition": {
+            "name": "Old Date",
+            "type": "datetime",
+            "template": {
+              "timezone": "",
+              "dateFormat": "local",
+              "timeFormat": "12h",
+              "displayTimeZone": false
+            }
+          }
+        },
+        {
+          "id": "fq6b7cEveEa",
+          "sdkName": "newDate",
+          "definition": {
+            "name": "New Date",
+            "type": "datetime",
+            "template": {
+              "timezone": "",
+              "dateFormat": "local",
+              "timeFormat": "12h",
+              "displayTimeZone": false
+            }
+          }
+        },
+        {
+          "id": "fpuVeRjK9H3",
+          "sdkName": "oldLocation",
+          "definition": {
+            "name": "Old Location",
+            "type": "single_line_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "fjyASCv3HR6",
+          "sdkName": "newLocation",
+          "definition": {
+            "name": "New Location",
+            "type": "single_line_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "f2wMoncNmfT",
+          "sdkName": "reason",
+          "definition": {
+            "name": "Reason",
+            "type": "long_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "fbfydL5FqM2",
+          "sdkName": "changedById",
+          "definition": {
+            "name": "Changed By Id",
+            "type": "single_line_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "fjehqCawDgt",
+          "sdkName": "created",
+          "definition": {
+            "name": "Created",
+            "type": "created_at",
+            "template": {
+              "timezone": "",
+              "dateFormat": "local",
+              "timeFormat": "12h",
+              "displayTimeZone": false
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "txfkzXfvAYu",
+      "sdkName": "graduationItems",
+      "name": "Graduation Items",
+      "primaryFieldId": "fepwyZdQY3i",
+      "fields": [
+        {
+          "id": "fepwyZdQY3i",
+          "sdkName": "label",
+          "definition": {
+            "name": "Label",
+            "type": "single_line_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "f5y7njjMJ8u",
+          "sdkName": "thesis",
+          "definition": {
+            "name": "Thesis",
+            "type": "linked_record",
+            "template": {
+              "tableId": "teoe1GgDtsZ",
+              "isInverse": false,
+              "allowMultiple": true,
+              "inverseFieldId": "forfYscKRi6"
+            }
+          }
+        },
+        {
+          "id": "fxm5DsQbevZ",
+          "sdkName": "itemKey",
+          "definition": {
+            "name": "Item Key",
+            "type": "single_line_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "f9hcLSK8YXM",
+          "sdkName": "files",
+          "definition": {
+            "name": "Files",
+            "type": "attachments",
+            "template": {}
+          }
+        },
+        {
+          "id": "f81YEJUK7xw",
+          "sdkName": "itemStatus",
+          "definition": {
+            "name": "Item Status",
+            "type": "single_select",
+            "template": {
+              "options": [
+                {
+                  "value": "9XLU",
+                  "label": "pending",
+                  "color": "purple"
+                },
+                {
+                  "value": "bDib",
+                  "label": "submitted",
+                  "color": "orange"
+                },
+                {
+                  "value": "c5ir",
+                  "label": "verified",
+                  "color": "blue"
+                },
+                {
+                  "value": "94qX",
+                  "label": "rejected",
+                  "color": "gray"
+                }
+              ],
+              "disableColors": false
+            }
+          }
+        },
+        {
+          "id": "fdr9x7xURHo",
+          "sdkName": "note",
+          "definition": {
+            "name": "Note",
+            "type": "long_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "f4kSCw511mu",
+          "sdkName": "verifiedById",
+          "definition": {
+            "name": "Verified By Id",
+            "type": "single_line_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "fx8M2nAGhho",
+          "sdkName": "verifiedAt",
+          "definition": {
+            "name": "Verified At",
+            "type": "datetime",
+            "template": {
+              "timezone": "",
+              "dateFormat": "local",
+              "timeFormat": "12h",
+              "displayTimeZone": false
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "teEab9P777h",
+      "sdkName": "reminderRules",
+      "name": "Reminder Rules",
+      "primaryFieldId": "fnRM6JmfY27",
+      "fields": [
+        {
+          "id": "fnRM6JmfY27",
+          "sdkName": "statusKey",
+          "definition": {
+            "name": "Status Key",
+            "type": "single_line_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "fc4WwM4UGn1",
+          "sdkName": "notifyAfterDays",
+          "definition": {
+            "name": "Notify After Days",
+            "type": "number",
+            "template": {
+              "numberFormat": "local",
+              "decimalPlaces": 1
+            }
+          }
+        },
+        {
+          "id": "fhVrBG3VxGN",
+          "sdkName": "remindAfterDays",
+          "definition": {
+            "name": "Remind After Days",
+            "type": "number",
+            "template": {
+              "numberFormat": "local",
+              "decimalPlaces": 1
+            }
+          }
+        },
+        {
+          "id": "fd7SKqxZoWn",
+          "sdkName": "escalateAfterDays",
+          "definition": {
+            "name": "Escalate After Days",
+            "type": "number",
+            "template": {
+              "numberFormat": "local",
+              "decimalPlaces": 1
+            }
+          }
+        },
+        {
+          "id": "fhVL5Ug63uY",
+          "sdkName": "escalateToRole",
+          "definition": {
+            "name": "Escalate To Role",
+            "type": "single_select",
+            "template": {
+              "options": [
+                {
+                  "value": "fmwn",
+                  "label": "group_manager",
+                  "color": "purple"
+                },
+                {
+                  "value": "vRk1",
+                  "label": "graduate_office",
+                  "color": "orange"
+                },
+                {
+                  "value": "ofxu",
+                  "label": "admin",
+                  "color": "blue"
+                }
+              ],
+              "disableColors": false
+            }
+          }
+        },
+        {
+          "id": "f981jo9GUeU",
+          "sdkName": "isActive",
+          "definition": {
+            "name": "Is Active",
+            "type": "checkbox",
+            "template": {
+              "defaultValue": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "tdqcVZPBdbe",
+      "sdkName": "reminderLogs",
+      "name": "Reminder Logs",
+      "primaryFieldId": "f3Tb7fSp186",
+      "fields": [
+        {
+          "id": "f3Tb7fSp186",
+          "sdkName": "dedupeKey",
+          "definition": {
+            "name": "Dedupe Key",
+            "type": "single_line_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "fbMpeC1CaGQ",
+          "sdkName": "thesisId",
+          "definition": {
+            "name": "Thesis Id",
+            "type": "single_line_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "fdCDZcp29FD",
+          "sdkName": "stage",
+          "definition": {
+            "name": "Stage",
+            "type": "single_select",
+            "template": {
+              "options": [
+                {
+                  "value": "643Z",
+                  "label": "notify",
+                  "color": "purple"
+                },
+                {
+                  "value": "pvDc",
+                  "label": "remind",
+                  "color": "orange"
+                },
+                {
+                  "value": "aitY",
+                  "label": "escalate",
+                  "color": "blue"
+                }
+              ],
+              "disableColors": false
+            }
+          }
+        },
+        {
+          "id": "fuqBNcR4Tbf",
+          "sdkName": "recipients",
+          "definition": {
+            "name": "Recipients",
+            "type": "long_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "f6eoNsgNuZ6",
+          "sdkName": "created",
+          "definition": {
+            "name": "Created",
+            "type": "created_at",
+            "template": {
+              "timezone": "",
+              "dateFormat": "local",
+              "timeFormat": "12h",
+              "displayTimeZone": false
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "tx2N8KDwcBN",
+      "sdkName": "notificationTemplates",
+      "name": "Notification Templates",
+      "primaryFieldId": "fjQhFKQvRya",
+      "fields": [
+        {
+          "id": "fjQhFKQvRya",
+          "sdkName": "key",
+          "definition": {
+            "name": "Key",
+            "type": "single_line_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "fqCGUETqCLW",
+          "sdkName": "title",
+          "definition": {
+            "name": "Title",
+            "type": "single_line_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "fb5EER3wonA",
+          "sdkName": "body",
+          "definition": {
+            "name": "Body",
+            "type": "long_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "fhxqjAXeZTP",
+          "sdkName": "channels",
+          "definition": {
+            "name": "Channels",
+            "type": "multiple_select",
+            "template": {
+              "options": [
+                {
+                  "value": "tKNG",
+                  "label": "inApp",
+                  "color": "purple"
+                },
+                {
+                  "value": "i749",
+                  "label": "email",
+                  "color": "orange"
+                },
+                {
+                  "value": "gwvw",
+                  "label": "sms",
+                  "color": "blue"
+                }
+              ],
+              "disableColors": false
+            }
+          }
+        },
+        {
+          "id": "fop4thr2pNL",
+          "sdkName": "isActive",
+          "definition": {
+            "name": "Is Active",
+            "type": "checkbox",
+            "template": {
+              "defaultValue": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "t4VWKpwnRL2",
+      "sdkName": "notificationLogs",
+      "name": "Notification Logs",
+      "primaryFieldId": "fovW9tobqdU",
+      "fields": [
+        {
+          "id": "fovW9tobqdU",
+          "sdkName": "title",
+          "definition": {
+            "name": "Title",
+            "type": "single_line_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "fuUb2MzizTY",
+          "sdkName": "profileId",
+          "definition": {
+            "name": "Profile Id",
+            "type": "single_line_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "fxk5u5VynPk",
+          "sdkName": "channel",
+          "definition": {
+            "name": "Channel",
+            "type": "single_select",
+            "template": {
+              "options": [
+                {
+                  "value": "rYuL",
+                  "label": "inApp",
+                  "color": "purple"
+                },
+                {
+                  "value": "tL6Z",
+                  "label": "email",
+                  "color": "orange"
+                },
+                {
+                  "value": "qYeF",
+                  "label": "sms",
+                  "color": "blue"
+                }
+              ],
+              "disableColors": false
+            }
+          }
+        },
+        {
+          "id": "fjDa7zbtitG",
+          "sdkName": "templateKey",
+          "definition": {
+            "name": "Template Key",
+            "type": "single_line_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "f5Z3Ap8A3r6",
+          "sdkName": "recipient",
+          "definition": {
+            "name": "Recipient",
+            "type": "single_line_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "fviaUJsNG6c",
+          "sdkName": "body",
+          "definition": {
+            "name": "Body",
+            "type": "long_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "fu8YH7PmMUH",
+          "sdkName": "deliveryStatus",
+          "definition": {
+            "name": "Delivery Status",
+            "type": "single_select",
+            "template": {
+              "options": [
+                {
+                  "value": "oWWx",
+                  "label": "sent",
+                  "color": "purple"
+                },
+                {
+                  "value": "tTNb",
+                  "label": "logged",
+                  "color": "orange"
+                },
+                {
+                  "value": "sr3A",
+                  "label": "failed",
+                  "color": "blue"
+                },
+                {
+                  "value": "7XQP",
+                  "label": "skipped",
+                  "color": "gray"
+                }
+              ],
+              "disableColors": false
+            }
+          }
+        },
+        {
+          "id": "foCxcX6q948",
+          "sdkName": "error",
+          "definition": {
+            "name": "Error",
+            "type": "long_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "fmVgTBa7v1p",
           "sdkName": "created",
           "definition": {
             "name": "Created",

@@ -15,6 +15,7 @@ export default createEndpoint({
     fullName: z.string(),
     roles: z.array(z.enum(ROLES)),
     departmentId: z.string().nullable(),
+    programId: z.string().nullable().optional(),
     studentNumber: z.string(),
     nationalCode: z.string().optional(),
     degree: z.string(),
@@ -38,6 +39,7 @@ export default createEndpoint({
 
     const record = {
       username, fullName: input.fullName.trim(), roles: input.roles, department: input.departmentId,
+      ...(input.programId !== undefined ? { program: input.programId } : {}),
       studentNumber: input.studentNumber.trim() || null, ...(input.nationalCode ? { nationalCode: input.nationalCode } : {}),
       degree: input.degree || null, programName: input.programName.trim() || null, academicRank: input.academicRank || null,
       baseCapacity: input.baseCapacity, eligibleForThesis: input.eligibleForThesis, disabled: input.disabled,

@@ -1,7 +1,7 @@
 import { useSession } from '../../lib/session';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { adminResetPassword, adminUpdateUser, type AdminUpdateUserInputType, type ListDepartmentsOutputType } from 'zitejs/api';
+import { adminStructure, type AdminStructureOutputType, adminResetPassword, adminUpdateUser, type AdminUpdateUserInputType, type ListDepartmentsOutputType } from 'zitejs/api';
 import { Button } from '@project/components/ui/button';
 import { Checkbox } from '@project/components/ui/checkbox';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@project/components/ui/dialog';
@@ -26,7 +26,7 @@ export default function UserEditDialog({ user, departments, onClose, onSaved }: 
   const [f, setF] = useState({
     username: user?.username ?? '', fullName: user?.fullName ?? '', roles: (user?.roles ?? []) as AdminUpdateUserInputType['roles'],
     departmentId: user?.departmentId ?? '', studentNumber: user?.studentNumber ?? '', nationalCode: '', degree: user?.degree ?? '',
-    programName: user?.programName ?? '', academicRank: user?.academicRank ?? '', baseCapacity: user?.baseCapacity ?? 0,
+    programName: user?.programName ?? '', programId: user?.programId ?? '', academicRank: user?.academicRank ?? '', baseCapacity: user?.baseCapacity ?? 0,
     eligibleForThesis: user?.eligibleForThesis ?? false, disabled: user?.disabled ?? false,
   });
   const [temp, setTemp] = useState(user ? '' : genPassword());
@@ -48,7 +48,7 @@ export default function UserEditDialog({ user, departments, onClose, onSaved }: 
   const save = async () => {
     setBusy(true);
     try {
-      await adminUpdateUser({ token, profileId: user?.profileId, tempPassword: user ? undefined : temp, ...f, departmentId: f.departmentId || null, nationalCode: f.nationalCode || undefined });
+      await adminUpdateUser({ token, profileId: user?.profileId, tempPassword: user ? undefined : temp, ...f, departmentId: f.departmentId || null, programId: f.programId || null, nationalCode: f.nationalCode || undefined });
       toast.success('کاربر به‌روزرسانی شد.');
       onSaved();
     } catch (e) {
@@ -95,7 +95,7 @@ export default function UserEditDialog({ user, departments, onClose, onSaved }: 
                 <Input dir="ltr" placeholder="برای تغییر وارد کنید" value={f.nationalCode} onChange={(e) => set('nationalCode', e.target.value.replace(/\D/g, ''))} maxLength={10} />
                 {ncInvalid && <p className="text-xs text-destructive">کد ملی باید ۱۰ رقم باشد.</p>}
               </div>
-              <div className="space-y-1.5"><Label>رشته/گرایش</Label><Input value={f.programName} onChange={(e) => set('programName', e.target.value)} /></div>
+              <div className="space-y-1.5"><Label>رشته/گرایش</Label><ProgramSelect departmentId={f.departmentId} value={f.programId} onChange={(id, label) => setF((x) => ({ ...x, programId: id, programName: label }))} /></div>
               <div className="space-y-1.5">
                 <Label>مقطع</Label>
                 <Select value={f.degree || undefined} onValueChange={(v) => set('degree', v)}>
@@ -126,5 +126,20 @@ export default function UserEditDialog({ user, departments, onClose, onSaved }: 
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function ProgramSelect({ departmentId, value, onChange }: { departmentId: string; value: string; onChange: (id: string, label: string) => void }) {
+  const { token } = useSession();
+  const [programs, setPrograms] = useState<AdminStructureOutputType['programs']>([]);
+  useEffect(() => { adminStructure({ token, op: 'list' }).then((r) => setPrograms(r.programs)).catch(() => undefined); }, [token]);
+  const list = programs.filter((p) => p.isActive && (!departmentId || p.departmentId === departmentId));
+  const label = (p: AdminStructureOutputType['programs'][number]) => `${p.name}${p.specialization ? ' — ' + p.specialization : ''} (${p.degree})`;
+  if (!list.length) return <p className="rounded-md border border-dashed p-2 text-xs text-muted-foreground">برای این گروه رشته‌ای تعریف نشده است (پیکربندی ← ساختار آموزشی).</p>;
+  return (
+    <Select value={value || undefined} onValueChange={(v) => { const p = list.find((x) => x.id === v); onChange(v, p ? label(p) : ''); }}>
+      <SelectTrigger><SelectValue placeholder="انتخاب رشته/گرایش" /></SelectTrigger>
+      <SelectContent>{list.map((p) => <SelectItem key={p.id} value={p.id}>{label(p)}</SelectItem>)}</SelectContent>
+    </Select>
   );
 }

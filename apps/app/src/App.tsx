@@ -18,6 +18,10 @@ import AdminAudit from './pages/admin/AdminAudit';
 import AdminTerms from './pages/admin/AdminTerms';
 import ProfilePage from './pages/ProfilePage';
 import ReportsPage from './pages/ReportsPage';
+import AdminConfig from './pages/admin/AdminConfig';
+import RoleGuard from './components/RoleGuard';
+
+const STAFF = ['professor', 'group_manager', 'graduate_office', 'finance', 'admin'];
 
 export default function App() {
   const [token, setTokenState] = useState(getToken());
@@ -28,6 +32,10 @@ export default function App() {
     document.documentElement.dir = 'rtl';
     document.documentElement.lang = 'fa';
     document.title = 'شمال‌داک | سامانه مدیریت پایان‌نامه دانشگاه شمال';
+    let icon = document.querySelector<HTMLLinkElement>("link[rel='icon']");
+    if (!icon) { icon = document.createElement('link'); icon.rel = 'icon'; document.head.appendChild(icon); }
+    icon.type = 'image/png';
+    icon.href = '/brand/favicon.png';
     if (localStorage.getItem('shomaldoc-theme') === 'dark') document.documentElement.classList.add('dark');
   }, []);
 
@@ -71,15 +79,16 @@ export default function App() {
         <Layout>
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/theses" element={<ThesesPage />} />
+            <Route path="/theses" element={<RoleGuard roles={STAFF}><ThesesPage /></RoleGuard>} />
             <Route path="/thesis/:id" element={<ThesisDetailPage />} />
             <Route path="/profile" element={<ProfilePage />} />
- <Route path="/reports" element={<ReportsPage />} />
-            <Route path="/terms" element={<AdminTerms />} />
-            <Route path="/admin/users" element={<AdminUsers />} />
-            <Route path="/admin/departments" element={<AdminDepartments />} />
-            <Route path="/admin/settings" element={<AdminSettings />} />
-            <Route path="/admin/audit" element={<AdminAudit />} />
+            <Route path="/reports" element={<RoleGuard roles={['group_manager', 'graduate_office', 'admin']}><ReportsPage /></RoleGuard>} />
+            <Route path="/terms" element={<RoleGuard roles={['graduate_office', 'admin']}><AdminTerms /></RoleGuard>} />
+            <Route path="/admin/users" element={<RoleGuard roles={['admin']}><AdminUsers /></RoleGuard>} />
+            <Route path="/admin/departments" element={<RoleGuard roles={['admin']}><AdminDepartments /></RoleGuard>} />
+            <Route path="/admin/settings" element={<RoleGuard roles={['admin']}><AdminSettings /></RoleGuard>} />
+            <Route path="/admin/config" element={<RoleGuard roles={['admin']}><AdminConfig /></RoleGuard>} />
+            <Route path="/admin/audit" element={<RoleGuard roles={['admin']}><AdminAudit /></RoleGuard>} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Layout>

@@ -40,6 +40,9 @@ export const STATUS: Record<string, { label: string; tone: 'gray' | 'amber' | 'b
   DEFENSE_SCHEDULING: { label: 'تعیین زمان دفاع', tone: 'amber' },
   DEFENSE_SCHEDULED: { label: 'دفاع زمان‌بندی شد', tone: 'blue' },
   DEFENDED: { label: 'دفاع شده', tone: 'green' },
+  THESIS_COMPLETED: { label: 'پایان‌نامه تکمیل شد', tone: 'blue' },
+  GRADUATION_PROCESS: { label: 'فرآیند فارغ‌التحصیلی', tone: 'amber' },
+  GRADUATED: { label: 'فارغ‌التحصیل — پرونده بسته', tone: 'green' },
   REJECTED: { label: 'رد شده', tone: 'red' },
   CANCELLED: { label: 'لغو شده', tone: 'red' },
 };
@@ -70,6 +73,13 @@ export const ACTION_LABELS: Record<string, string> = {
   schedule_defense: 'تعیین زمان و محل دفاع',
   record_defense: 'ثبت نتیجهٔ دفاع و صدور صورتجلسه',
   cancel: 'لغو پرونده',
+  topic_change_approve: 'تأیید درخواست تغییر موضوع',
+  topic_change_reject: 'رد درخواست تغییر موضوع',
+  reschedule_defense: 'تغییر تاریخ/محل دفاع',
+  confirm_completion: 'تأیید تکمیل پایان‌نامه (پس از اصلاحات دفاع)',
+  start_graduation: 'آغاز فرآیند فارغ‌التحصیلی',
+  graduate: 'تأیید فارغ‌التحصیلی و بستن پرونده',
+  reopen_case: 'بازگشایی پرونده برای ویرایش',
 };
 
 export const STEP_LABELS: Record<string, string> = {
@@ -89,6 +99,7 @@ export const STAGES = [
   { key: 'final', label: 'نسخه نهایی و همانندجویی', statuses: ['FINAL_SUPERVISOR_REVIEW', 'FINAL_REVISION', 'PLAGIARISM_CHECK'] },
   { key: 'review', label: 'داوری', statuses: ['REVIEWER_ASSIGNMENT', 'REVIEWING'] },
   { key: 'defense', label: 'دفاع', statuses: ['DEFENSE_SCHEDULING', 'DEFENSE_SCHEDULED', 'DEFENDED'] },
+  { key: 'graduation', label: 'فارغ‌التحصیلی', statuses: ['THESIS_COMPLETED', 'GRADUATION_PROCESS', 'GRADUATED'] },
 ];
 
 export const fa = (n: number | string) => String(n).replace(/\d/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[Number(d)]);

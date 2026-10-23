@@ -13,11 +13,11 @@ import { useSession } from '../lib/session';
 import { ACTION_LABELS, errMsg, fa } from '../lib/format';
 
 type Action = ThesisActionInputType['action'];
-const NEEDS_COMMENT: Action[] = ['supervisor_reject', 'group_topic_revision', 'group_reject', 'literature_revision', 'proposal_revision', 'irandoc_reject', 'commission_approve', 'commission_reject', 'extension_reject', 'cancel', 'final_revision', 'plagiarism_fail'];
+const NEEDS_COMMENT: Action[] = ['supervisor_reject', 'group_topic_revision', 'group_reject', 'literature_revision', 'proposal_revision', 'irandoc_reject', 'commission_approve', 'commission_reject', 'extension_reject', 'cancel', 'final_revision', 'plagiarism_fail', 'topic_change_reject', 'reschedule_defense', 'reopen_case'];
 const NEEDS_PROF: Action[] = ['group_assign_supervisor'];
 const OPTIONAL_PROF: Action[] = ['group_approve_topic', 'set_advisor'];
-const WITH_FILES: Action[] = ['irandoc_approve', 'commission_approve', 'commission_reject', 'plagiarism_pass', 'plagiarism_fail'];
-const DANGER: Action[] = ['supervisor_reject', 'group_reject', 'cancel', 'group_topic_revision', 'literature_revision', 'proposal_revision', 'irandoc_reject', 'commission_reject', 'extension_reject', 'final_revision', 'plagiarism_fail'];
+const WITH_FILES: Action[] = ['irandoc_approve', 'commission_approve', 'commission_reject', 'plagiarism_pass', 'plagiarism_fail', 'confirm_completion'];
+const DANGER: Action[] = ['topic_change_reject', 'reopen_case', 'supervisor_reject', 'group_reject', 'cancel', 'group_topic_revision', 'literature_revision', 'proposal_revision', 'irandoc_reject', 'commission_reject', 'extension_reject', 'final_revision', 'plagiarism_fail'];
 const REJECT_REASONS = ['تکمیل ظرفیت', 'عدم تناسب موضوع با تخصص', 'نیاز به تعریف دقیق‌تر موضوع'];
 const HINTS: Partial<Record<Action, string>> = {
   irandoc_approve: 'با تأیید، پیش‌شرط‌های تصویب نهایی (موضوع، راهنما، پروپوزال و فایل آن، کد/رسید/گواهی ایرانداک) به‌طور خودکار بررسی و در صورت کامل‌بودن، پایان‌نامه مصوب می‌شود. اگر گواهی توسط دانشجو بارگذاری نشده، آن را اینجا پیوست کنید.',
@@ -28,6 +28,13 @@ const HINTS: Partial<Record<Action, string>> = {
   plagiarism_fail: 'پرونده برای اصلاح نسخهٔ نهایی به دانشجو برمی‌گردد.',
   assign_reviewers: 'داوران انتخاب‌شده از طریق اعلان مطلع می‌شوند و نظر داوری خود را در سامانه ثبت می‌کنند.',
   cancel: 'لغو پرونده غیرقابل بازگشت است و ظرفیت استاد آزاد می‌شود.',
+  reschedule_defense: 'تاریخ و محل قبلی، علت و نام شما در تاریخچهٔ تغییرات دفاع ثبت می‌شود و دانشجو، استادان و داوران مطلع می‌شوند. تاریخ‌های گذشته، کمتر از حداقل فاصله با تصویب پروپوزال، یا متداخل با دفاع دیگر پذیرفته نمی‌شود.',
+  schedule_defense: 'حداقل فاصلهٔ تصویب پروپوزال تا دفاع و تداخل محل/اعضای هیئت به‌طور خودکار کنترل می‌شود.',
+  topic_change_approve: 'در صورت تأیید نهایی، عنوان پرونده به عنوان جدید تغییر می‌کند و نسخهٔ موضوع ثبت می‌شود.',
+  confirm_completion: 'نسخهٔ اصلاح‌شدهٔ پس از دفاع را (در صورت وجود) پیوست کنید. سپس تحصیلات تکمیلی فرآیند فارغ‌التحصیلی را آغاز می‌کند.',
+  start_graduation: 'چک‌لیست مدارک فارغ‌التحصیلی (طبق تنظیمات) برای دانشجو ایجاد می‌شود.',
+  graduate: 'فقط وقتی همهٔ مدارک چک‌لیست تأیید شده باشند ممکن است. پس از آن پرونده بسته و قفل می‌شود.',
+  reopen_case: 'پروندهٔ بسته برای ویرایش باز می‌شود. علت در رویدادها ثبت می‌شود.',
 };
 
 export default function ActionPanel(props: { thesisId: string; departmentId: string; supervisorId: string; actions: string[]; onDone: () => void }) {
@@ -56,7 +63,7 @@ export default function ActionPanel(props: { thesisId: string; departmentId: str
     try {
       await thesisAction({ token, thesisId: props.thesisId, action: open, comment: finalComment || undefined, targetId: target || undefined, files,
         similarity: s4.similarity ? Number(s4.similarity) : undefined, reviewers: s4.reviewers.length ? s4.reviewers : undefined,
-        defenseDate: s4.defenseDate?.toISOString(), defenseLocation: s4.defenseLocation || undefined, score: s4.score ? Number(s4.score) : undefined,
+        defenseDate: s4.defenseDate?.toISOString(), defenseLocation: s4.defenseLocation || undefined, score: s4.score ? Number(s4.score) : undefined, gapException: s4.gapException || undefined,
       });
       toast.success('عملیات با موفقیت ثبت شد.');
       setOpen(null);

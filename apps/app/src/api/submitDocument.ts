@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { createEndpoint } from 'zitejs/backend';
 import { zite } from 'zitejs/db';
-import { audit, bad, chainSetting, findStudentThesis, forbidden, newVersion, requireAuth } from '../lib/server';
+import { assertEditable, audit, bad, chainSetting, findStudentThesis, forbidden, loadProposalForm, newVersion, requireAuth, validateAnswers } from '../lib/server';
 
 const RULES = {
   topic: { from: ['TOPIC_REVISION'], to: 'GROUP_REVIEW', label: 'ارسال مجدد موضوع' },
@@ -17,6 +17,7 @@ export default createEndpoint({
     kind: z.enum(['topic', 'literature', 'proposal', 'final']),
     content: z.string(),
     files: z.array(z.object({ url: z.string(), filename: z.string() })),
+    formAnswers: z.record(z.string()).optional(),
   }),
   outputSchema: z.object({ ok: z.boolean() }),
   execute: async ({ input }) => {
@@ -25,10 +26,23 @@ export default createEndpoint({
     if (!t) bad('پرونده‌ای یافت نشد.');
     const rule = RULES[input.kind];
     if (!(rule.from as readonly string[]).includes(t.status ?? '')) forbidden('در وضعیت فعلی پرونده این ارسال مجاز نیست.');
-    if (input.content.trim().length < 20) bad('متن ارسالی باید حداقل ۲۰ نویسه باشد.');
+    assertEditable(t);
+    let content = input.content.trim();
+    let answersJson: string | undefined;
+    if (input.kind === 'proposal') {
+      const form = await loadProposalForm();
+      if (form.fields.length) {
+        const answers = input.formAnswers ?? {};
+        validateAnswers(form.fields, answers);
+        answersJson = JSON.stringify(answers);
+        content = form.fields.filter((f) => answers[f.key]?.trim()).map((f) => `${f.label}:\n${answers[f.key].trim()}`).join('\n\n') + (content ? `\n\n${content}` : '');
+      }
+    }
+    if (content.length < 20) bad('متن ارسالی باید حداقل ۲۰ نویسه باشد.');
     if ((input.kind === 'proposal' || input.kind === 'final') && input.files.length === 0) bad('بارگذاری فایل (Word یا PDF) الزامی است.');
-    await newVersion({ thesisId: t.id, kind: input.kind, content: input.content.trim(), files: input.files, userId: p.id });
-    const record: { status: string; proposalStep?: string } = { status: rule.to };
+    await newVersion({ thesisId: t.id, kind: input.kind, content, files: input.files, userId: p.id });
+    const record: { status: string; proposalStep?: string; formAnswers?: string } = { status: rule.to };
+    if (answersJson) record.formAnswers = answersJson;
     if (input.kind === 'proposal') record.proposalStep = (await chainSetting('proposalApprovalChain'))[0];
     await zite.theses.update({ id: t.id, record });
     await audit({ action: rule.label, actor: p.id, role: 'student', thesisId: t.id, from: t.status, to: rule.to });

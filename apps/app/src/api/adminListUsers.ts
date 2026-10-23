@@ -9,7 +9,7 @@ export default createEndpoint({
   outputSchema: z.object({
     users: z.array(z.object({
       profileId: z.string(), username: z.string(), fullName: z.string(), roles: z.array(z.string()),
-      departmentId: z.string(), studentNumber: z.string(), nationalCodeMasked: z.string(), degree: z.string(),
+      departmentId: z.string(), programId: z.string(), studentNumber: z.string(), nationalCodeMasked: z.string(), degree: z.string(),
       programName: z.string(), academicRank: z.string(), baseCapacity: z.number(), eligibleForThesis: z.boolean(),
       disabled: z.boolean(), locked: z.boolean(), mustChangePassword: z.boolean(),
     })),
@@ -17,7 +17,7 @@ export default createEndpoint({
   execute: async ({ input }) => {
     await requireAuth(input.token, ['admin']);
     const { rows } = await zite.sql({
-      query: `SELECT p.id, p."username", p."fullName", p."roles", dp."departmentsId" AS dep, p."studentNumber", p."nationalCode",
+      query: `SELECT p.id, p."username", p."fullName", p."roles", dp."departmentsId" AS dep, (SELECT pp."programsId" FROM "ProfilesPrograms" pp WHERE pp."profilesId" = p.id LIMIT 1) AS prog, p."studentNumber", p."nationalCode",
         p."degree", p."programName", p."academicRank", p."baseCapacity", p."eligibleForThesis", p."disabled", p."mustChangePassword",
         (p."lockedUntil" > now()) AS locked
         FROM "Profiles" p LEFT JOIN "DepartmentsProfiles" dp ON dp."profilesId" = p.id
@@ -30,7 +30,7 @@ export default createEndpoint({
     return {
       users: rows.map((r) => ({
         profileId: s(r.id), username: s(r.username), fullName: s(r.fullName), roles: Array.isArray(r.roles) ? (r.roles as string[]) : [],
-        departmentId: s(r.dep), studentNumber: s(r.studentNumber), nationalCodeMasked: mask(s(r.nationalCode)), degree: s(r.degree),
+        departmentId: s(r.dep), programId: s(r.prog), studentNumber: s(r.studentNumber), nationalCodeMasked: mask(s(r.nationalCode)), degree: s(r.degree),
         programName: s(r.programName), academicRank: s(r.academicRank), baseCapacity: Number(r.baseCapacity ?? 0),
         eligibleForThesis: !!r.eligibleForThesis, disabled: !!r.disabled, locked: !!r.locked, mustChangePassword: !!r.mustChangePassword,
       })),

@@ -7,7 +7,7 @@ export default function Stepper({ status }: { status: string }) {
   return (
     <ol className="flex w-full items-center gap-1 overflow-x-auto" aria-label="مراحل پرونده">
       {STAGES.map((s, i) => {
-        const done = idx > i || status === 'DEFENDED' || (status === 'PROPOSAL_APPROVED' && i <= idx);
+        const done = idx > i || status === 'GRADUATED' || (['PROPOSAL_APPROVED', 'DEFENDED'].includes(status) && i <= idx);
         const cur = idx === i && !done;
         return (
           <li key={s.key} className="flex min-w-[110px] flex-1 items-center gap-2">

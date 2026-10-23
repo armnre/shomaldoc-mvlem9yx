@@ -1,7 +1,8 @@
 import { useSession } from '../../lib/session';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { submitDocument, type SubmitDocumentInputType } from 'zitejs/api';
+import { proposalForm, submitDocument, type SubmitDocumentInputType } from 'zitejs/api';
+import DynamicForm, { fieldErrors, type FormField } from '../../components/DynamicForm';
 import { Button } from '@project/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@project/components/ui/card';
 import { Label } from '@project/components/ui/label';
@@ -21,12 +22,18 @@ export default function DocumentSubmit({ kind, lastComment, onDone }: { kind: Su
   const [content, setContent] = useState('');
   const [files, setFiles] = useState<UploadedFile[]>([]);
   const [busy, setBusy] = useState(false);
+  const [fields, setFields] = useState<FormField[]>([]);
+  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [touched, setTouched] = useState(false);
+  useEffect(() => { if (kind === 'proposal') proposalForm({ token }).then((r) => setFields(r.fields)).catch((e) => toast.error(errMsg(e))); }, [kind, token]);
   const m = META[kind];
-  const valid = content.trim().length >= 20 && ((kind !== 'proposal' && kind !== 'final') || files.length > 0);
+  const dynamic = kind === 'proposal' && fields.length > 0;
+  const formOk = !dynamic || Object.keys(fieldErrors(fields, answers)).length === 0;
+  const valid = (dynamic ? formOk : content.trim().length >= 20) && ((kind !== 'proposal' && kind !== 'final') || files.length > 0);
   const submit = async () => {
     setBusy(true);
     try {
-      await submitDocument({ token,  kind, content, files });
+      await submitDocument({ token, kind, content, files, formAnswers: dynamic ? answers : undefined });
       toast.success('ارسال شد و نسخهٔ جدید ثبت گردید.');
       onDone();
     } catch (e) {
@@ -43,10 +50,11 @@ export default function DocumentSubmit({ kind, lastComment, onDone }: { kind: Su
       </CardHeader>
       <CardContent className="space-y-4">
         {lastComment && <div className="rounded-md border border-amber-300 bg-accent p-3 text-sm text-accent-foreground">نظر بررسی‌کننده: {lastComment}</div>}
+        {dynamic && <div onBlur={() => setTouched(true)}><DynamicForm fields={fields} value={answers} onChange={setAnswers} showErrors={touched} /></div>}
         <div className="space-y-1.5">
-          <Label htmlFor="dc">{m.label}</Label>
+          <Label htmlFor="dc">{dynamic ? 'توضیحات تکمیلی (اختیاری)' : m.label}</Label>
           <Textarea id="dc" rows={8} value={content} onChange={(e) => setContent(e.target.value)} />
-          <p className="text-xs text-muted-foreground">{fa(content.trim().length)} نویسه (حداقل ۲۰)</p>
+          {!dynamic && <p className="text-xs text-muted-foreground">{fa(content.trim().length)} نویسه (حداقل ۲۰)</p>}
         </div>
         <FileUploader files={files} onChange={setFiles} />
         <Button disabled={!valid || busy} onClick={submit}>{busy ? 'در حال ارسال…' : 'ارسال'}</Button>

@@ -6,7 +6,7 @@ import { Button } from '@project/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@project/components/ui/card';
 import { Input } from '@project/components/ui/input';
 import { Label } from '@project/components/ui/label';
-import { DatePicker } from '@project/components/ui/date-picker';
+import DatePicker from '../../components/JalaliDatePicker';
 import FileUploader, { type UploadedFile } from '../../components/FileUploader';
 import { useSession } from '../../lib/session';
 import { errMsg } from '../../lib/format';

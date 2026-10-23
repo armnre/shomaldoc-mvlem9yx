@@ -38,7 +38,7 @@ export default createEndpoint({
     const code = `SHD-${year}-${String(Number(rows[0]?.c ?? 0) + 1).padStart(4, '0')}`;
     const t = await zite.theses.create({
       record: {
-        ...rec, thesisCode: code, studentId: p.id, department: dep, status: 'DRAFT', proposalStep: null,
+        ...rec, thesisCode: code, studentId: p.id, department: dep, program: first(p.program) ?? null, status: 'DRAFT', proposalStep: null,
         supervisorId: null, advisorId: null, supervisorRejections: 0, topicApprovedAt: null, proposalApprovedAt: null,
         thesisApprovedAt: null, termsUsed: 0, allowedTerms: await intSetting('baseAllowedTerms'),
         supervisorRequests: null, documentVersions: null, auditLogs: null,
