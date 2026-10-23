@@ -8,7 +8,7 @@ export default defineConfig({
   timeout: 180_000,
   workers: 1,
   reporter: [['list']],
-  use: { baseURL: `http://127.0.0.1:${PORT}`, locale: 'fa-IR', trace: 'retain-on-failure' },
+  use: { baseURL: `http://127.0.0.1:${PORT}`, locale: 'fa-IR', trace: 'retain-on-failure', screenshot: 'only-on-failure' },
   projects: [{ name: 'chromium', use: { browserName: 'chromium' } }],
   webServer: {
     command: 'npx tsx --tsconfig tsconfig.json src/index.ts',
