@@ -115,8 +115,8 @@ export default function LoginScreen({ onSignedIn }: { onSignedIn: () => void }) 
             </>
           )}
         </form>
-        <div className="flex flex-col items-center gap-2">
-          <p className="text-[11px] text-muted-foreground lg:hidden">© ۱۴۰۵ دانشگاه شمال — کلیه حقوق محفوظ است.</p>
+        <div className="flex flex-col items-center gap-1.5 text-[11px] text-muted-foreground/80">
+          <p className="lg:hidden">© ۱۴۰۵ دانشگاه شمال — کلیه حقوق محفوظ است.</p>
           <DevCredit />
         </div>
       </main>

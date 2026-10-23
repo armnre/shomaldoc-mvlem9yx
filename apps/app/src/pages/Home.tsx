@@ -30,10 +30,17 @@ export default function Home() {
   if (role === 'student') return <StudentHome />;
   if (role === 'reviewer') return <ReviewerInbox />;
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold">سلام{me.fullName ? `، ${me.fullName}` : ''}</h1>
-        <p className="text-muted-foreground">{ROLE_LABELS[role]}{me.departmentName ? ` — گروه ${me.departmentName}` : ''}</p>
+    <div className="space-y-6 sm:space-y-8">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-l from-primary to-primary/85 p-5 text-primary-foreground shadow-sm sm:p-7">
+        <div className="absolute -left-10 -top-10 h-40 w-40 rounded-full bg-sidebar-primary/20 blur-2xl" />
+        <div className="relative flex flex-wrap items-end justify-between gap-3">
+          <div className="space-y-1">
+            <p className="text-xs opacity-80">{new Intl.DateTimeFormat('fa-IR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(new Date())}</p>
+            <h1 className="text-xl font-extrabold sm:text-2xl">سلام{me.fullName ? `، ${me.fullName}` : ''}</h1>
+            <p className="text-sm opacity-90">{ROLE_LABELS[role]}{me.departmentName ? ` — گروه ${me.departmentName}` : ''}</p>
+          </div>
+          <span className="rounded-full bg-white/15 px-3 py-1 text-xs">کارتابل شما موارد منتظر اقدام را نشان می‌دهد</span>
+        </div>
       </div>
       {['group_manager', 'graduate_office', 'admin'].includes(role) && <StatsPanel scope={role as 'admin'} />}
       <section className="space-y-3">

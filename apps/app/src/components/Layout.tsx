@@ -10,7 +10,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { cn } from '@project/components/lib/utils';
 import Logo from './Logo';
 import NotificationBell from './NotificationBell';
-import DevCredit from './DevCredit';
 import { useSession } from '../lib/session';
 import { ROLE_LABELS } from '../lib/format';
 
@@ -107,10 +106,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </div>
         </header>
         <main className="mx-auto max-w-7xl px-3 py-5 sm:px-4 md:px-8 md:py-8">{children}</main>
-        <footer className="mx-auto flex max-w-7xl flex-col items-center gap-3 border-t px-4 py-5 text-center text-[11px] text-muted-foreground sm:flex-row sm:justify-between sm:text-right md:px-8">
-          <span>© ۱۴۰۵ دانشگاه شمال، معاونت پژوهش و فناوری — کلیه حقوق محفوظ است.</span>
-          <DevCredit />
-        </footer>
       </div>
     </div>
   );
