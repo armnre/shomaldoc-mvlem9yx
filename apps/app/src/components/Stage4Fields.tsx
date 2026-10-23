@@ -7,7 +7,7 @@ import { Checkbox } from '@project/components/ui/checkbox';
 import { Badge } from '@project/components/ui/badge';
 import JalaliDatePicker from './JalaliDatePicker';
 import { useSession } from '../lib/session';
-import { errMsg } from '../lib/format';
+import { errMsg, fa } from '../lib/format';
 
 export type Stage4Values = {
   similarity: string;
@@ -64,17 +64,24 @@ function ReviewerPicker({ thesisId, v, set }: { thesisId: string; v: Stage4Value
   const { token } = useSession();
   const [people, setPeople] = useState<ListReviewerCandidatesOutputType['people']>([]);
   useEffect(() => { listReviewerCandidates({ token, thesisId }).then((r) => setPeople(r.people)).catch((e) => toast.error(errMsg(e))); }, [thesisId, token]);
+  const [q, setQ] = useState('');
+  const shown = people.filter((p) => !q || p.name.includes(q) || p.department.includes(q));
+  const nIn = v.reviewers.filter((r) => r.type === 'internal').length;
   const toggle = (id: string, on: boolean, same: boolean) =>
     set({ ...v, reviewers: on ? [...v.reviewers, { id, type: same ? 'internal' : 'external' }] : v.reviewers.filter((r) => r.id !== id) });
   return (
     <div className="space-y-2">
-      <Label>داوران (داخلی: هم‌گروه، خارجی: سایر گروه‌ها / داوران مدعو)</Label>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <Label>انتخاب داوران</Label>
+        <span className="text-xs text-muted-foreground">{fa(v.reviewers.length)} انتخاب‌شده · {fa(nIn)} داخلی · {fa(v.reviewers.length - nIn)} خارجی</span>
+      </div>
+      <Input placeholder="جستجوی نام یا گروه…" value={q} onChange={(e) => setQ(e.target.value)} />
       <div className="max-h-64 space-y-1 overflow-y-auto rounded-md border p-2">
-        {people.length === 0 && <p className="p-2 text-sm text-muted-foreground">موردی یافت نشد.</p>}
-        {people.map((p) => {
+        {shown.length === 0 && <p className="p-2 text-sm text-muted-foreground">موردی یافت نشد.</p>}
+        {shown.map((p) => {
           const on = v.reviewers.some((r) => r.id === p.id);
           return (
-            <label key={p.id} className="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-sm hover:bg-muted">
+            <label key={p.id} className={`flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-sm hover:bg-muted ${on ? 'bg-accent/60' : ''}`}>
               <Checkbox checked={on} onCheckedChange={(c) => toggle(p.id, !!c, p.sameDepartment)} />
               <span className="flex-1">{p.name}</span>
               <span className="text-xs text-muted-foreground">{p.department}</span>
@@ -83,6 +90,7 @@ function ReviewerPicker({ thesisId, v, set }: { thesisId: string; v: Stage4Value
           );
         })}
       </div>
+      <p className="text-xs text-muted-foreground">داخلی: هم‌گروه — خارجی: سایر گروه‌ها یا داوران مدعو. داوران از طریق اعلان مطلع می‌شوند.</p>
     </div>
   );
 }
