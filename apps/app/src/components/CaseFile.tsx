@@ -172,7 +172,28 @@ export function ProcessCards({ d }: { d: D }) {
                   <Badge variant={e.status === 'rejected' ? 'destructive' : e.status === 'approved' ? 'default' : 'outline'}>{EX[e.status] ?? e.status}</Badge>
                 </div>
                 <p className="whitespace-pre-wrap">{e.reason}</p>
-                <div className="text-xs text-muted-foreground">مسیر تأیید: {e.chain.split(',').filter(Boolean).map((x) => STEP_LABELS[x] ?? x).join(' ← ')}</div>
+                {(() => {
+                  const steps = e.chain.split(',').filter(Boolean);
+                  const live = e.status === 'pending' && d.thesis?.status === 'EXTENSION_REQUESTED';
+                  const curIdx = live ? steps.indexOf(d.thesis?.proposalStep ?? '') : -1;
+                  return (
+                    <div className="flex flex-wrap items-center gap-1.5 text-xs">
+                      <span className="text-muted-foreground">مسیر تأیید:</span>
+                      {steps.map((x, i) => {
+                        const done = e.status === 'approved' || (curIdx >= 0 && i < curIdx);
+                        const cur = i === curIdx;
+                        return (
+                          <span key={x} className="flex items-center gap-1.5">
+                            <span className={`rounded-full border px-2 py-0.5 ${cur ? 'border-sidebar-primary bg-accent font-bold text-accent-foreground' : done ? 'border-primary/40 bg-primary/10 text-primary' : 'text-muted-foreground'}`}>
+                              {done && '✓ '}{STEP_LABELS[x] ?? x}{cur && ' (در انتظار)'}
+                            </span>
+                            {i < steps.length - 1 && <span className="text-muted-foreground">←</span>}
+                          </span>
+                        );
+                      })}
+                    </div>
+                  );
+                })()}
                 {e.commissionNotes && <div className="rounded-md bg-accent p-2 text-accent-foreground">کمیسیون: {e.commissionNotes}</div>}
                 {e.decisions && <pre className="whitespace-pre-wrap font-sans text-xs text-muted-foreground">{fa(e.decisions)}</pre>}
                 <FileLinks files={[...e.documents, ...e.commissionFiles]} />
