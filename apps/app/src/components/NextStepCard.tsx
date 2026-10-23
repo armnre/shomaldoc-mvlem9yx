@@ -23,7 +23,7 @@ export const OWNER: Record<string, string> = {
   SPECIAL_COMMISSION: 'کمیسیون موارد خاص', EXTENSION_REQUESTED: 'زنجیرهٔ تأیید تمدید', FINAL_SUPERVISOR_REVIEW: 'استاد راهنما',
   PLAGIARISM_CHECK: 'تحصیلات تکمیلی', REVIEWER_ASSIGNMENT: 'مدیر گروه', REVIEWING: 'داوران',
   DEFENSE_SCHEDULING: 'تحصیلات تکمیلی', DEFENSE_SCHEDULED: 'هیئت داوران (جلسهٔ دفاع)', DEFENDED: 'تحصیلات تکمیلی',
-  THESIS_COMPLETED: 'تحصیلات تکمیلی', GRADUATION_IN_PROGRESS: 'واحدهای تسویه',
+  THESIS_COMPLETED: 'تحصیلات تکمیلی', GRADUATION_PROCESS: 'واحدهای تسویه',
 };
 
 /** Hero card: what the student must do now, or who the case is waiting on. */

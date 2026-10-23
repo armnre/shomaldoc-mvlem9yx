@@ -83,7 +83,8 @@ export function GraduationPanel({ thesisId, status, onChange }: { thesisId: stri
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base"><GraduationCap className="h-4 w-4" /> چک‌لیست فارغ‌التحصیلی</CardTitle>
-        <p className="text-sm text-muted-foreground">{done.toLocaleString('fa-IR')} از {data.items.length.toLocaleString('fa-IR')} مدرک تأیید شده</p>
+        <p className="text-sm text-muted-foreground">{done.toLocaleString('fa-IR')} از {data.items.length.toLocaleString('fa-IR')} مدرک تأیید شده{data.items.length > 0 && done === data.items.length && status !== 'GRADUATED' ? ' — همهٔ مدارک تأیید شده؛ «ثبت فارغ‌التحصیلی» فعال است.' : ''}</p>
+        <div className="h-2 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-primary transition-all" style={{ width: `${data.items.length ? (done / data.items.length) * 100 : 0}%` }} /></div>
       </CardHeader>
       <CardContent className="space-y-3">
         {data.items.map((i) => <GradItem key={i.id} i={i} thesisId={thesisId} canSubmit={data.canSubmit} canVerify={data.canVerify} onDone={(r) => { setData(r); onChange(); }} />)}
