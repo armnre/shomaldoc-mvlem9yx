@@ -2,7 +2,7 @@ import { useSession } from '../lib/session';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDebounce } from 'use-debounce';
-import { Download, Inbox, Search } from 'lucide-react';
+import { ChevronLeft, Download, Inbox, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { listTheses, type ListThesesOutputType, type ListThesesInputType } from 'zitejs/api';
 import { Input } from '@project/components/ui/input';
@@ -69,7 +69,21 @@ export default function ThesisTable({ scope, inboxOnly }: { scope: Scope; inboxO
           <Download className="ml-2 h-4 w-4" /> خروجی CSV
         </Button>
       </div>
-      <div className="overflow-hidden rounded-xl border bg-card">
+      <div className="space-y-2 md:hidden">
+        {!data && [0, 1, 2].map((i) => <Skeleton key={i} className="h-24 rounded-xl" />)}
+        {data?.rows.map((r) => (
+          <button key={r.id} type="button" onClick={() => nav(`/thesis/${r.id}`)} className="flex w-full items-center gap-3 rounded-xl border bg-card p-4 text-right shadow-sm transition-colors active:bg-muted">
+            <div className="min-w-0 flex-1 space-y-1.5">
+              <div className="flex items-center justify-between gap-2"><span className="font-mono text-[11px] text-muted-foreground">{r.code}</span><span className="text-[11px] text-muted-foreground">{jalali(r.updatedAt)}</span></div>
+              <div className="line-clamp-2 text-sm font-semibold">{r.titleFa || 'عنوان ثبت نشده'}</div>
+              <div className="text-xs text-muted-foreground">{r.studentName || '—'}{r.studentNumber && ` · ${fa(r.studentNumber)}`}</div>
+              <StatusBadge status={r.status} />
+            </div>
+            <ChevronLeft className="h-4 w-4 shrink-0 text-muted-foreground" />
+          </button>
+        ))}
+      </div>
+      <div className="hidden overflow-hidden rounded-xl border bg-card md:block">
         <Table>
           <TableHeader>
             <TableRow>
@@ -100,13 +114,13 @@ export default function ThesisTable({ scope, inboxOnly }: { scope: Scope; inboxO
             ))}
           </TableBody>
         </Table>
-        {data && data.rows.length === 0 && (
-          <div className="flex flex-col items-center gap-2 py-12 text-muted-foreground">
-            <Inbox className="h-8 w-8" />
-            {inboxOnly ? 'اقدامی در انتظار شما نیست.' : 'پرونده‌ای یافت نشد.'}
-          </div>
-        )}
       </div>
+      {data && data.rows.length === 0 && (
+        <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed bg-card py-12 text-muted-foreground">
+          <Inbox className="h-8 w-8" />
+          {inboxOnly ? 'اقدامی در انتظار شما نیست. 👌' : 'پرونده‌ای یافت نشد.'}
+        </div>
+      )}
       {data && data.total > data.pageSize && (
         <div className="flex items-center justify-between text-sm">
           <span className="text-muted-foreground">{fa(data.total)} پرونده</span>

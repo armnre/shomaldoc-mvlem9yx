@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { listProfessors, thesisAction, type ListProfessorsOutputType, type ThesisActionInputType } from 'zitejs/api';
+import { CheckCircle2, CornerUpLeft, Zap } from 'lucide-react';
 import { Button } from '@project/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@project/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@project/components/ui/dialog';
@@ -76,12 +77,20 @@ export default function ActionPanel(props: { thesisId: string; departmentId: str
   };
 
   return (
-    <Card className="border-primary/30 bg-gradient-to-l from-accent/60 to-card">
-      <CardHeader className="pb-3"><CardTitle className="text-base">اقدامات مجاز شما روی این پرونده</CardTitle></CardHeader>
-      <CardContent className="flex flex-wrap gap-2">
-        {props.actions.map((a) => (
-          <Button key={a} variant={DANGER.includes(a as Action) ? 'outline' : 'default'} onClick={() => start(a as Action)}>{ACTION_LABELS[a] ?? a}</Button>
-        ))}
+    <Card className="border-2 border-sidebar-primary/50 bg-gradient-to-l from-accent/60 to-card shadow-sm">
+      <CardHeader className="space-y-1 pb-3">
+        <CardTitle className="flex items-center gap-2 text-base"><Zap className="h-5 w-5 text-sidebar-primary" />این پرونده منتظر اقدام شماست</CardTitle>
+        <p className="text-xs text-muted-foreground">پس از ثبت، پرونده به مرحلهٔ بعد می‌رود و افراد مرتبط از طریق اعلان مطلع می‌شوند.</p>
+      </CardHeader>
+      <CardContent className="grid gap-2 sm:flex sm:flex-wrap">
+        {[...props.actions].sort((a, b) => Number(DANGER.includes(a as Action)) - Number(DANGER.includes(b as Action))).map((a) => {
+          const neg = DANGER.includes(a as Action);
+          return (
+            <Button key={a} variant={neg ? 'outline' : 'default'} className={neg ? 'border-destructive/40 text-destructive hover:text-destructive' : ''} onClick={() => start(a as Action)}>
+              {neg ? <CornerUpLeft className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}{ACTION_LABELS[a] ?? a}
+            </Button>
+          );
+        })}
       </CardContent>
       <Dialog open={!!open} onOpenChange={(o) => !o && setOpen(null)}>
         <DialogContent dir="rtl" className="max-h-[90vh] overflow-y-auto">
@@ -124,7 +133,7 @@ export default function ActionPanel(props: { thesisId: string; departmentId: str
             </div>
             {open && WITH_FILES.includes(open) && <FileUploader files={files} onChange={setFiles} />}
           </div>
-          <DialogFooter className="gap-2">
+          <DialogFooter className="flex-col-reverse gap-2 sm:flex-row">
             <Button variant="outline" onClick={() => setOpen(null)}>انصراف</Button>
             <Button onClick={submit} disabled={!valid || busy} variant={open && DANGER.includes(open) ? 'destructive' : 'default'}>{busy ? 'در حال ثبت…' : 'تأیید و ثبت'}</Button>
           </DialogFooter>

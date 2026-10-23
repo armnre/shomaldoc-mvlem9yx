@@ -17,7 +17,7 @@ const STUDENT_TODO: Record<string, string> = {
   THESIS_ACTIVE: 'پس از اتمام نگارش، نسخهٔ نهایی پایان‌نامه را ارسال کنید.',
   FINAL_REVISION: 'نسخهٔ نهایی را طبق نظرات اصلاح و دوباره ارسال کنید.',
 };
-const OWNER: Record<string, string> = {
+export const OWNER: Record<string, string> = {
   WAITING_SUPERVISOR: 'استاد راهنما', GROUP_ASSIGNMENT: 'مدیر گروه', GROUP_REVIEW: 'مدیر گروه',
   LITERATURE_SUPERVISOR_REVIEW: 'استاد راهنما', PROPOSAL_REVIEW: 'زنجیرهٔ تأیید پروپوزال', IRANDOC_REVIEW: 'تحصیلات تکمیلی',
   SPECIAL_COMMISSION: 'کمیسیون موارد خاص', EXTENSION_REQUESTED: 'زنجیرهٔ تأیید تمدید', FINAL_SUPERVISOR_REVIEW: 'استاد راهنما',
