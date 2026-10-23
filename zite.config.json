@@ -1,0 +1,12 @@
+{
+  "project": {
+    "name": "ShomalDoc Thesis Management",
+    "basePublicIdentifier": "c422a6c74b06aa95"
+  },
+  "integrations": {
+    "github": {
+      "type": "github",
+      "connectionId": "svc_569337"
+    }
+  }
+}

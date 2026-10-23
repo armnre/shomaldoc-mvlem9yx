@@ -1,0 +1,88 @@
+@import '@fontsource-variable/vazirmatn/index.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Auto-restored theme variables */
+    --shadow-x: 0px;
+    --shadow-y: 1px;
+    --shadow-blur: 4px;
+    --shadow-spread: 0px;
+    --shadow-opacity: 0.2;
+    --shadow-color: #000000;
+    --shadow-2xs: var(--shadow-x) var(--shadow-y) color-mix(in srgb, var(--shadow-color) calc(var(--shadow-opacity) * 100%), transparent);
+    --shadow-xs: var(--shadow-x) var(--shadow-y) var(--shadow-blur) var(--shadow-spread) color-mix(in srgb, var(--shadow-color) calc(var(--shadow-opacity) * 100%), transparent);
+    --shadow-md: calc(var(--shadow-x) * 2) calc(var(--shadow-y) * 2) calc(var(--shadow-blur) * 3) calc(var(--shadow-spread) - 1px) color-mix(in srgb, var(--shadow-color) calc(var(--shadow-opacity) * 100%), transparent);
+    --shadow-lg: calc(var(--shadow-x) * 4) calc(var(--shadow-y) * 4) calc(var(--shadow-blur) * 5) calc(var(--shadow-spread) - 3px) color-mix(in srgb, var(--shadow-color) calc(var(--shadow-opacity) * 100%), transparent);
+    --shadow-xl: calc(var(--shadow-x) * 6) calc(var(--shadow-y) * 6) calc(var(--shadow-blur) * 7) calc(var(--shadow-spread) - 5px) color-mix(in srgb, var(--shadow-color) calc(var(--shadow-opacity) * 100%), transparent);
+    --shadow-2xl: calc(var(--shadow-x) * 8) calc(var(--shadow-y) * 8) calc(max(0px, var(--shadow-blur) * 9 - 8px)) calc(var(--shadow-spread) - 12px) color-mix(in srgb, var(--shadow-color) calc(var(--shadow-opacity) * 250%), transparent);
+
+    --background: 150 20% 98%;
+    --foreground: 168 35% 12%;
+    --muted: 150 16% 94%;
+    --muted-foreground: 165 10% 40%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 168 35% 12%;
+    --border: 150 14% 88%;
+    --input: 150 14% 86%;
+    --card: 0 0% 100%;
+    --card-foreground: 168 35% 12%;
+    --primary: 168 62% 24%;
+    --primary-foreground: 150 30% 98%;
+    --secondary: 160 24% 92%;
+    --secondary-foreground: 168 40% 18%;
+    --accent: 40 88% 94%;
+    --accent-foreground: 32 70% 28%;
+    --destructive: 0 72% 48%;
+    --destructive-foreground: 0 0% 100%;
+    --ring: 168 62% 30%;
+    --radius: 0.75rem;
+    --sidebar-background: 168 45% 14%;
+    --sidebar-foreground: 150 20% 88%;
+    --sidebar-primary: 40 88% 56%;
+    --sidebar-primary-foreground: 168 45% 10%;
+    --sidebar-accent: 168 38% 20%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 168 30% 22%;
+    --sidebar-ring: 40 88% 56%;
+    --chart-1: 168 62% 30%;
+    --chart-2: 40 88% 52%;
+    --chart-3: 200 55% 40%;
+    --chart-4: 350 60% 52%;
+    --chart-5: 140 40% 45%;
+    --font-sans: 'Vazirmatn Variable', Tahoma, sans-serif;
+    --font-mono: 'Vazirmatn Variable', monospace;
+    --shadow-sm: 0 1px 2px hsl(168 30% 10% / 0.06);
+    --shadow: 0 4px 16px -4px hsl(168 30% 10% / 0.10);
+  }
+
+  .dark {
+    --background: 168 30% 7%;
+    --foreground: 150 20% 92%;
+    --muted: 168 22% 13%;
+    --muted-foreground: 160 10% 62%;
+    --popover: 168 28% 9%;
+    --popover-foreground: 150 20% 92%;
+    --border: 168 20% 18%;
+    --input: 168 20% 20%;
+    --card: 168 28% 9%;
+    --card-foreground: 150 20% 92%;
+    --primary: 165 52% 46%;
+    --primary-foreground: 168 40% 8%;
+    --secondary: 168 22% 15%;
+    --secondary-foreground: 150 20% 92%;
+    --accent: 38 40% 18%;
+    --accent-foreground: 40 88% 70%;
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --ring: 165 52% 46%;
+  }
+}
+
+@layer base {
+  * { @apply border-border; }
+  body { @apply bg-background text-foreground font-sans antialiased; }
+}
