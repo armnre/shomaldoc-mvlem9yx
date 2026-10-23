@@ -1,0 +1,13 @@
+[Unit]
+Description=ShomalDoc thesis management API
+After=network.target postgresql.service
+
+[Service]
+WorkingDirectory=/opt/shomaldoc/server
+EnvironmentFile=/opt/shomaldoc/server/.env
+ExecStart=/usr/bin/npm start
+Restart=always
+User=shomaldoc
+
+[Install]
+WantedBy=multi-user.target

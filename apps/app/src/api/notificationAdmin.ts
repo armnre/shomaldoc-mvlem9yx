@@ -37,7 +37,7 @@ export default createEndpoint({
     const [{ rows }, { rows: cnt }] = await Promise.all([
       zite.sql({
         query: `SELECT l.id, l."title", l."channel", l."recipient", l."deliveryStatus", l."error", l."templateKey", l."created", p."fullName"
-                FROM "NotificationLogs" l LEFT JOIN "Profiles" p ON p.id = l."profileId" ${where} ORDER BY l."created" DESC LIMIT 50 OFFSET ${input.logPage * 50}`,
+                FROM "NotificationLogs" l LEFT JOIN "Profiles" p ON p.id::text = l."profileId" ${where} ORDER BY l."created" DESC LIMIT 50 OFFSET ${input.logPage * 50}`,
         params,
       }),
       zite.sql({ query: `SELECT COUNT(*)::int AS c FROM "NotificationLogs" l ${where}`, params }),

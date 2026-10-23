@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "strictNullChecks": true,
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "zitejs/db": ["../.zite/db.ts"],
+      "zitejs/runtime": ["./src/shims/runtime.ts"],
+      "zitejs/backend": ["./src/shims/backend.ts"],
+      "zitejs/pdf": ["./src/shims/pdf.ts"]
+    }
+  },
+  "include": ["src", "../apps/app/src/api", "../apps/app/src/lib/server.ts"]
+}

@@ -1,0 +1,5 @@
+**/node_modules
+server/web-dist
+server/uploads
+server/.env
+.git

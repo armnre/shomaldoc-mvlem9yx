@@ -1,0 +1,925 @@
+{
+ "Departments": {
+  "accessor": "departments",
+  "fields": {
+   "name": {
+    "kind": "text"
+   },
+   "faculty": {
+    "kind": "text"
+   },
+   "programs": {
+    "kind": "json"
+   },
+   "profiles": {
+    "kind": "link",
+    "table": "DepartmentsProfiles",
+    "self": "departmentsId",
+    "other": "profilesId",
+    "target": "Profiles"
+   },
+   "theses": {
+    "kind": "link",
+    "table": "DepartmentsTheses",
+    "self": "departmentsId",
+    "other": "thesesId",
+    "target": "Theses"
+   },
+   "programs1": {
+    "kind": "link",
+    "table": "DepartmentsPrograms",
+    "self": "departmentsId",
+    "other": "programsId",
+    "target": "Programs"
+   },
+   "facultyRef": {
+    "kind": "link",
+    "table": "DepartmentsFaculties",
+    "self": "departmentsId",
+    "other": "facultiesId",
+    "target": "Faculties"
+   }
+  }
+ },
+ "Profiles": {
+  "accessor": "profiles",
+  "fields": {
+   "fullName": {
+    "kind": "text"
+   },
+   "roles": {
+    "kind": "json"
+   },
+   "department": {
+    "kind": "link",
+    "table": "DepartmentsProfiles",
+    "self": "profilesId",
+    "other": "departmentsId",
+    "target": "Departments"
+   },
+   "studentNumber": {
+    "kind": "text"
+   },
+   "nationalCode": {
+    "kind": "text"
+   },
+   "programName": {
+    "kind": "text"
+   },
+   "degree": {
+    "kind": "text"
+   },
+   "academicRank": {
+    "kind": "text"
+   },
+   "baseCapacity": {
+    "kind": "number"
+   },
+   "eligibleForThesis": {
+    "kind": "boolean"
+   },
+   "username": {
+    "kind": "text"
+   },
+   "passwordHash": {
+    "kind": "text"
+   },
+   "failedLogins": {
+    "kind": "number"
+   },
+   "lockedUntil": {
+    "kind": "datetime"
+   },
+   "mustChangePassword": {
+    "kind": "boolean"
+   },
+   "disabled": {
+    "kind": "boolean"
+   },
+   "program": {
+    "kind": "link",
+    "table": "ProfilesPrograms",
+    "self": "profilesId",
+    "other": "programsId",
+    "target": "Programs"
+   },
+   "email": {
+    "kind": "text"
+   },
+   "phone": {
+    "kind": "text"
+   },
+   "notifyEmail": {
+    "kind": "boolean"
+   },
+   "notifySms": {
+    "kind": "boolean"
+   }
+  }
+ },
+ "Theses": {
+  "accessor": "theses",
+  "fields": {
+   "thesisCode": {
+    "kind": "text"
+   },
+   "department": {
+    "kind": "link",
+    "table": "DepartmentsTheses",
+    "self": "thesesId",
+    "other": "departmentsId",
+    "target": "Departments"
+   },
+   "titleFa": {
+    "kind": "text"
+   },
+   "titleEn": {
+    "kind": "text"
+   },
+   "keywords": {
+    "kind": "text"
+   },
+   "problemStatement": {
+    "kind": "text"
+   },
+   "objectives": {
+    "kind": "text"
+   },
+   "status": {
+    "kind": "text"
+   },
+   "proposalStep": {
+    "kind": "text"
+   },
+   "supervisorRejections": {
+    "kind": "number"
+   },
+   "topicApprovedAt": {
+    "kind": "datetime"
+   },
+   "proposalApprovedAt": {
+    "kind": "datetime"
+   },
+   "supervisorRequests": {
+    "kind": "link",
+    "table": "SupervisorRequestsTheses",
+    "self": "thesesId",
+    "other": "supervisorRequestsId",
+    "target": "SupervisorRequests"
+   },
+   "documentVersions": {
+    "kind": "link",
+    "table": "DocumentVersionsTheses",
+    "self": "thesesId",
+    "other": "documentVersionsId",
+    "target": "DocumentVersions"
+   },
+   "auditLogs": {
+    "kind": "link",
+    "table": "AuditLogsTheses",
+    "self": "thesesId",
+    "other": "auditLogsId",
+    "target": "AuditLogs"
+   },
+   "studentId": {
+    "kind": "text"
+   },
+   "supervisorId": {
+    "kind": "text"
+   },
+   "advisorId": {
+    "kind": "text"
+   },
+   "termsUsed": {
+    "kind": "number"
+   },
+   "allowedTerms": {
+    "kind": "number"
+   },
+   "thesisApprovedAt": {
+    "kind": "datetime"
+   },
+   "iranDocRecords": {
+    "kind": "link",
+    "table": "IranDocRecordsTheses",
+    "self": "thesesId",
+    "other": "iranDocRecordsId",
+    "target": "IranDocRecords"
+   },
+   "extensions": {
+    "kind": "link",
+    "table": "ExtensionsTheses",
+    "self": "thesesId",
+    "other": "extensionsId",
+    "target": "Extensions"
+   },
+   "similarityPercent": {
+    "kind": "number"
+   },
+   "plagiarismReport": {
+    "kind": "attachments"
+   },
+   "defenseDate": {
+    "kind": "datetime"
+   },
+   "defenseLocation": {
+    "kind": "text"
+   },
+   "defenseScore": {
+    "kind": "number"
+   },
+   "defenseGrade": {
+    "kind": "text"
+   },
+   "minutesPdf": {
+    "kind": "attachments"
+   },
+   "defendedAt": {
+    "kind": "datetime"
+   },
+   "reviews": {
+    "kind": "link",
+    "table": "ReviewsTheses",
+    "self": "thesesId",
+    "other": "reviewsId",
+    "target": "Reviews"
+   },
+   "program": {
+    "kind": "link",
+    "table": "ProgramsTheses",
+    "self": "thesesId",
+    "other": "programsId",
+    "target": "Programs"
+   },
+   "formAnswers": {
+    "kind": "text"
+   },
+   "isLocked": {
+    "kind": "boolean"
+   },
+   "completedAt": {
+    "kind": "datetime"
+   },
+   "graduatedAt": {
+    "kind": "datetime"
+   },
+   "topicChanges": {
+    "kind": "link",
+    "table": "ThesesTopicChanges",
+    "self": "thesesId",
+    "other": "topicChangesId",
+    "target": "TopicChanges"
+   },
+   "defenseChanges": {
+    "kind": "link",
+    "table": "DefenseChangesTheses",
+    "self": "thesesId",
+    "other": "defenseChangesId",
+    "target": "DefenseChanges"
+   },
+   "graduationItems": {
+    "kind": "link",
+    "table": "GraduationItemsTheses",
+    "self": "thesesId",
+    "other": "graduationItemsId",
+    "target": "GraduationItems"
+   }
+  }
+ },
+ "SupervisorRequests": {
+  "accessor": "supervisorRequests",
+  "fields": {
+   "summary": {
+    "kind": "text"
+   },
+   "thesis": {
+    "kind": "link",
+    "table": "SupervisorRequestsTheses",
+    "self": "supervisorRequestsId",
+    "other": "thesesId",
+    "target": "Theses"
+   },
+   "requestStatus": {
+    "kind": "text"
+   },
+   "reason": {
+    "kind": "text"
+   },
+   "decidedAt": {
+    "kind": "datetime"
+   },
+   "professorId": {
+    "kind": "text"
+   }
+  }
+ },
+ "DocumentVersions": {
+  "accessor": "documentVersions",
+  "fields": {
+   "label": {
+    "kind": "text"
+   },
+   "thesis": {
+    "kind": "link",
+    "table": "DocumentVersionsTheses",
+    "self": "documentVersionsId",
+    "other": "thesesId",
+    "target": "Theses"
+   },
+   "kind": {
+    "kind": "text"
+   },
+   "versionNumber": {
+    "kind": "number"
+   },
+   "content": {
+    "kind": "text"
+   },
+   "files": {
+    "kind": "attachments"
+   },
+   "isActive": {
+    "kind": "boolean"
+   },
+   "reviewStatus": {
+    "kind": "text"
+   },
+   "reviewComment": {
+    "kind": "text"
+   },
+   "submittedById": {
+    "kind": "text"
+   }
+  }
+ },
+ "AuditLogs": {
+  "accessor": "auditLogs",
+  "fields": {
+   "action": {
+    "kind": "text"
+   },
+   "thesis": {
+    "kind": "link",
+    "table": "AuditLogsTheses",
+    "self": "auditLogsId",
+    "other": "thesesId",
+    "target": "Theses"
+   },
+   "actorRole": {
+    "kind": "text"
+   },
+   "fromStatus": {
+    "kind": "text"
+   },
+   "toStatus": {
+    "kind": "text"
+   },
+   "comment": {
+    "kind": "text"
+   },
+   "created": {
+    "kind": "created"
+   },
+   "actorId": {
+    "kind": "text"
+   },
+   "ipAddress": {
+    "kind": "text"
+   }
+  }
+ },
+ "Settings": {
+  "accessor": "settings",
+  "fields": {
+   "key": {
+    "kind": "text"
+   },
+   "value": {
+    "kind": "text"
+   },
+   "description": {
+    "kind": "text"
+   }
+  }
+ },
+ "Sessions": {
+  "accessor": "sessions",
+  "fields": {
+   "tokenHash": {
+    "kind": "text"
+   },
+   "profileId": {
+    "kind": "text"
+   },
+   "expiresAt": {
+    "kind": "datetime"
+   },
+   "lastSeenAt": {
+    "kind": "datetime"
+   },
+   "userAgent": {
+    "kind": "text"
+   },
+   "ipAddress": {
+    "kind": "text"
+   },
+   "revoked": {
+    "kind": "boolean"
+   },
+   "created": {
+    "kind": "created"
+   }
+  }
+ },
+ "IranDocRecords": {
+  "accessor": "iranDocRecords",
+  "fields": {
+   "trackingCode": {
+    "kind": "text"
+   },
+   "thesis": {
+    "kind": "link",
+    "table": "IranDocRecordsTheses",
+    "self": "iranDocRecordsId",
+    "other": "thesesId",
+    "target": "Theses"
+   },
+   "registeredOn": {
+    "kind": "date"
+   },
+   "receipt": {
+    "kind": "attachments"
+   },
+   "certificate": {
+    "kind": "attachments"
+   },
+   "reviewStatus": {
+    "kind": "text"
+   },
+   "reviewComment": {
+    "kind": "text"
+   },
+   "isActive": {
+    "kind": "boolean"
+   },
+   "created": {
+    "kind": "created"
+   }
+  }
+ },
+ "Extensions": {
+  "accessor": "extensions",
+  "fields": {
+   "label": {
+    "kind": "text"
+   },
+   "thesis": {
+    "kind": "link",
+    "table": "ExtensionsTheses",
+    "self": "extensionsId",
+    "other": "thesesId",
+    "target": "Theses"
+   },
+   "reason": {
+    "kind": "text"
+   },
+   "documents": {
+    "kind": "attachments"
+   },
+   "needsCommission": {
+    "kind": "boolean"
+   },
+   "commissionResult": {
+    "kind": "text"
+   },
+   "commissionNotes": {
+    "kind": "text"
+   },
+   "commissionFiles": {
+    "kind": "attachments"
+   },
+   "extensionStatus": {
+    "kind": "text"
+   },
+   "chain": {
+    "kind": "text"
+   },
+   "decisions": {
+    "kind": "text"
+   },
+   "termNumber": {
+    "kind": "number"
+   },
+   "created": {
+    "kind": "created"
+   }
+  }
+ },
+ "AcademicTerms": {
+  "accessor": "academicTerms",
+  "fields": {
+   "name": {
+    "kind": "text"
+   },
+   "startDate": {
+    "kind": "date"
+   },
+   "endDate": {
+    "kind": "date"
+   },
+   "processed": {
+    "kind": "boolean"
+   },
+   "processedAt": {
+    "kind": "datetime"
+   }
+  }
+ },
+ "Reviews": {
+  "accessor": "reviews",
+  "fields": {
+   "label": {
+    "kind": "text"
+   },
+   "thesis": {
+    "kind": "link",
+    "table": "ReviewsTheses",
+    "self": "reviewsId",
+    "other": "thesesId",
+    "target": "Theses"
+   },
+   "reviewerId": {
+    "kind": "text"
+   },
+   "reviewerType": {
+    "kind": "text"
+   },
+   "verdict": {
+    "kind": "text"
+   },
+   "score": {
+    "kind": "number"
+   },
+   "comment": {
+    "kind": "text"
+   },
+   "files": {
+    "kind": "attachments"
+   },
+   "submittedAt": {
+    "kind": "datetime"
+   },
+   "round": {
+    "kind": "number"
+   }
+  }
+ },
+ "Notifications": {
+  "accessor": "notifications",
+  "fields": {
+   "title": {
+    "kind": "text"
+   },
+   "profileId": {
+    "kind": "text"
+   },
+   "body": {
+    "kind": "text"
+   },
+   "thesisId": {
+    "kind": "text"
+   },
+   "isRead": {
+    "kind": "boolean"
+   },
+   "created": {
+    "kind": "created"
+   }
+  }
+ },
+ "Faculties": {
+  "accessor": "faculties",
+  "fields": {
+   "name": {
+    "kind": "text"
+   },
+   "code": {
+    "kind": "text"
+   },
+   "departments": {
+    "kind": "link",
+    "table": "DepartmentsFaculties",
+    "self": "facultiesId",
+    "other": "departmentsId",
+    "target": "Departments"
+   }
+  }
+ },
+ "Programs": {
+  "accessor": "programs",
+  "fields": {
+   "name": {
+    "kind": "text"
+   },
+   "specialization": {
+    "kind": "text"
+   },
+   "degree": {
+    "kind": "text"
+   },
+   "department": {
+    "kind": "link",
+    "table": "DepartmentsPrograms",
+    "self": "programsId",
+    "other": "departmentsId",
+    "target": "Departments"
+   },
+   "isActive": {
+    "kind": "boolean"
+   },
+   "profiles": {
+    "kind": "link",
+    "table": "ProfilesPrograms",
+    "self": "programsId",
+    "other": "profilesId",
+    "target": "Profiles"
+   },
+   "theses": {
+    "kind": "link",
+    "table": "ProgramsTheses",
+    "self": "programsId",
+    "other": "thesesId",
+    "target": "Theses"
+   }
+  }
+ },
+ "DynamicForms": {
+  "accessor": "dynamicForms",
+  "fields": {
+   "name": {
+    "kind": "text"
+   },
+   "kind": {
+    "kind": "text"
+   },
+   "isActive": {
+    "kind": "boolean"
+   },
+   "formFields": {
+    "kind": "link",
+    "table": "DynamicFormsFormFields",
+    "self": "dynamicFormsId",
+    "other": "formFieldsId",
+    "target": "FormFields"
+   }
+  }
+ },
+ "FormFields": {
+  "accessor": "formFields",
+  "fields": {
+   "label": {
+    "kind": "text"
+   },
+   "form": {
+    "kind": "link",
+    "table": "DynamicFormsFormFields",
+    "self": "formFieldsId",
+    "other": "dynamicFormsId",
+    "target": "DynamicForms"
+   },
+   "fieldKey": {
+    "kind": "text"
+   },
+   "fieldType": {
+    "kind": "text"
+   },
+   "required": {
+    "kind": "boolean"
+   },
+   "sortOrder": {
+    "kind": "number"
+   },
+   "options": {
+    "kind": "text"
+   },
+   "minLength": {
+    "kind": "number"
+   },
+   "maxLength": {
+    "kind": "number"
+   },
+   "helpText": {
+    "kind": "text"
+   }
+  }
+ },
+ "TopicChanges": {
+  "accessor": "topicChanges",
+  "fields": {
+   "label": {
+    "kind": "text"
+   },
+   "thesis": {
+    "kind": "link",
+    "table": "ThesesTopicChanges",
+    "self": "topicChangesId",
+    "other": "thesesId",
+    "target": "Theses"
+   },
+   "oldTitle": {
+    "kind": "text"
+   },
+   "newTitle": {
+    "kind": "text"
+   },
+   "newTitleEn": {
+    "kind": "text"
+   },
+   "reason": {
+    "kind": "text"
+   },
+   "files": {
+    "kind": "attachments"
+   },
+   "changeStatus": {
+    "kind": "text"
+   },
+   "prevStatus": {
+    "kind": "text"
+   },
+   "decisions": {
+    "kind": "text"
+   },
+   "requestedById": {
+    "kind": "text"
+   },
+   "created": {
+    "kind": "created"
+   }
+  }
+ },
+ "DefenseChanges": {
+  "accessor": "defenseChanges",
+  "fields": {
+   "label": {
+    "kind": "text"
+   },
+   "thesis": {
+    "kind": "link",
+    "table": "DefenseChangesTheses",
+    "self": "defenseChangesId",
+    "other": "thesesId",
+    "target": "Theses"
+   },
+   "oldDate": {
+    "kind": "datetime"
+   },
+   "newDate": {
+    "kind": "datetime"
+   },
+   "oldLocation": {
+    "kind": "text"
+   },
+   "newLocation": {
+    "kind": "text"
+   },
+   "reason": {
+    "kind": "text"
+   },
+   "changedById": {
+    "kind": "text"
+   },
+   "created": {
+    "kind": "created"
+   }
+  }
+ },
+ "GraduationItems": {
+  "accessor": "graduationItems",
+  "fields": {
+   "label": {
+    "kind": "text"
+   },
+   "thesis": {
+    "kind": "link",
+    "table": "GraduationItemsTheses",
+    "self": "graduationItemsId",
+    "other": "thesesId",
+    "target": "Theses"
+   },
+   "itemKey": {
+    "kind": "text"
+   },
+   "files": {
+    "kind": "attachments"
+   },
+   "itemStatus": {
+    "kind": "text"
+   },
+   "note": {
+    "kind": "text"
+   },
+   "verifiedById": {
+    "kind": "text"
+   },
+   "verifiedAt": {
+    "kind": "datetime"
+   }
+  }
+ },
+ "ReminderRules": {
+  "accessor": "reminderRules",
+  "fields": {
+   "statusKey": {
+    "kind": "text"
+   },
+   "notifyAfterDays": {
+    "kind": "number"
+   },
+   "remindAfterDays": {
+    "kind": "number"
+   },
+   "escalateAfterDays": {
+    "kind": "number"
+   },
+   "escalateToRole": {
+    "kind": "text"
+   },
+   "isActive": {
+    "kind": "boolean"
+   }
+  }
+ },
+ "ReminderLogs": {
+  "accessor": "reminderLogs",
+  "fields": {
+   "dedupeKey": {
+    "kind": "text"
+   },
+   "thesisId": {
+    "kind": "text"
+   },
+   "stage": {
+    "kind": "text"
+   },
+   "recipients": {
+    "kind": "text"
+   },
+   "created": {
+    "kind": "created"
+   }
+  }
+ },
+ "NotificationTemplates": {
+  "accessor": "notificationTemplates",
+  "fields": {
+   "key": {
+    "kind": "text"
+   },
+   "title": {
+    "kind": "text"
+   },
+   "body": {
+    "kind": "text"
+   },
+   "channels": {
+    "kind": "json"
+   },
+   "isActive": {
+    "kind": "boolean"
+   }
+  }
+ },
+ "NotificationLogs": {
+  "accessor": "notificationLogs",
+  "fields": {
+   "title": {
+    "kind": "text"
+   },
+   "profileId": {
+    "kind": "text"
+   },
+   "channel": {
+    "kind": "text"
+   },
+   "templateKey": {
+    "kind": "text"
+   },
+   "recipient": {
+    "kind": "text"
+   },
+   "body": {
+    "kind": "text"
+   },
+   "deliveryStatus": {
+    "kind": "text"
+   },
+   "error": {
+    "kind": "text"
+   },
+   "created": {
+    "kind": "created"
+   }
+  }
+ }
+}
