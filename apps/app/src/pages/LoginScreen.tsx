@@ -7,6 +7,7 @@ import { Input } from '@project/components/ui/input';
 import { Label } from '@project/components/ui/label';
 import { Checkbox } from '@project/components/ui/checkbox';
 import Logo from '../components/Logo';
+import DevCredit from '../components/DevCredit';
 import { errMsg } from '../lib/format';
 import { setToken } from '../lib/token';
 
@@ -74,9 +75,9 @@ export default function LoginScreen({ onSignedIn }: { onSignedIn: () => void }) 
             ))}
           </ul>
         </div>
-        <div className="relative space-y-1 text-xs opacity-70"><p>© ۱۴۰۵ دانشگاه شمال، معاونت پژوهش و فناوری — کلیه حقوق محفوظ است.</p><p>طراحی و توسعه: پارامیس تک</p></div>
+        <div className="relative space-y-1 text-xs opacity-70"><p>© ۱۴۰۵ دانشگاه شمال، معاونت پژوهش و فناوری — کلیه حقوق محفوظ است.</p></div>
       </aside>
-      <main className="flex items-center justify-center bg-background p-6">
+      <main className="flex flex-col items-center justify-center gap-10 bg-background p-6">
         <form onSubmit={submit} className="w-full max-w-sm space-y-6">
           <div className="space-y-3 text-center lg:text-right">
             <Logo className="mx-auto h-14 w-14 lg:hidden" />
@@ -114,6 +115,10 @@ export default function LoginScreen({ onSignedIn }: { onSignedIn: () => void }) 
             </>
           )}
         </form>
+        <div className="flex flex-col items-center gap-2">
+          <p className="text-[11px] text-muted-foreground lg:hidden">© ۱۴۰۵ دانشگاه شمال — کلیه حقوق محفوظ است.</p>
+          <DevCredit />
+        </div>
       </main>
     </div>
   );

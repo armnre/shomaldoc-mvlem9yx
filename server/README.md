@@ -2,6 +2,13 @@
 
 این پوشه نسخهٔ خودمیزبان سامانه است: همان endpointهای `apps/app/src/api` روی Express + PostgreSQL محلی اجرا می‌شوند و فرانت‌اند از `apps/app` ساخته می‌شود.
 
+## نصب سریع (پیشنهادی)
+```bash
+curl -fsSL https://raw.githubusercontent.com/armnre/shomaldoc-mvlem9yx/main/server/deploy/install.sh -o install.sh
+sudo bash install.sh        # DOMAIN=shomaldoc.shomal.ac.ir PORT=3080 پیش‌فرض
+```
+اسکریپت Node 22، Chrome، کاربر سیستمی، دیتابیس، `.env`، مهاجرت، build، سرویس systemd و بکاپ شبانه را انجام می‌دهد و برای به‌روزرسانی هم دوباره اجرا می‌شود. سپس فقط SSL و nginx را در Plesk طبق خروجی اسکریپت تنظیم کنید.
+
 ## پیش‌نیازها
 
 | مورد | نسخه |
@@ -55,12 +62,12 @@ sudo -u shomaldoc npm run build:web      # ساخت فرانت‌اند در ser
 ```bash
 sudo cp deploy/shomaldoc.service /etc/systemd/system/
 sudo systemctl daemon-reload && sudo systemctl enable --now shomaldoc
-curl -s http://127.0.0.1:3000/healthz   # {"ok":true,"db":"up",...}
+curl -s http://127.0.0.1:3080/healthz   # {"ok":true,"db":"up",...}
 ```
 `/healthz` وضعیت دیتابیس را برمی‌گرداند و در صورت قطعی DB کد 503 می‌دهد (برای مانیتورینگ).
 
 ## Plesk: Reverse proxy و SSL
-1. در Plesk: **Websites & Domains → Add Domain** (مثلاً `thesis.shomal.ac.ir`) با «No hosting» یا Hosting عادی.
+1. در Plesk: **Websites & Domains → Add Domain** (مثلاً `shomaldoc.shomal.ac.ir`) با «No hosting» یا Hosting عادی.
 2. **SSL/TLS Certificates → Let's Encrypt**: گواهی را برای دامنه (و www) صادر کنید و «Redirect from HTTP to HTTPS» را فعال کنید.
 3. **Apache & nginx Settings**:
    - تیک «Proxy mode» را بردارید (nginx مستقیم به Node وصل شود).
@@ -69,7 +76,7 @@ curl -s http://127.0.0.1:3000/healthz   # {"ok":true,"db":"up",...}
 client_max_body_size 25m;
 
 location / {
-    proxy_pass         http://127.0.0.1:3000;
+    proxy_pass         http://127.0.0.1:3080;
     proxy_http_version 1.1;
     proxy_set_header   Host              $host;
     proxy_set_header   X-Real-IP         $remote_addr;
@@ -78,7 +85,7 @@ location / {
     proxy_read_timeout 120s;
 }
 ```
-4. در `.env`: `TRUST_PROXY_HOPS=1` (فقط nginx پلسک جلوی Node است) و `FORCE_HSTS=true`. Node فقط روی `127.0.0.1` گوش می‌دهد؛ پورت 3000 را در فایروال باز نکنید.
+4. در `.env`: `TRUST_PROXY_HOPS=1` (فقط nginx پلسک جلوی Node است) و `FORCE_HSTS=true`. Node فقط روی `127.0.0.1` گوش می‌دهد؛ پورت 3080 را در فایروال باز نکنید.
 5. اگر بدون Plesk هستید، `deploy/nginx.conf` نمونهٔ معادل است.
 
 ## ایمیل و پیامک

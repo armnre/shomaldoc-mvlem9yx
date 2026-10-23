@@ -36,7 +36,7 @@ export default function TemplatesTab() {
         {d.templates.map((t) => <TemplateCard key={t.key} t={t} onSaved={setD} channel={channel} page={page} />)}
       </div>
       <Card>
-        <CardHeader className="flex-row items-center justify-between space-y-0">
+        <CardHeader className="flex-row flex-wrap items-center justify-between gap-2 space-y-0">
           <CardTitle className="text-base">لاگ ارسال اعلان‌ها ({fa(d.logTotal)})</CardTitle>
           <Select value={channel} onValueChange={(v) => { setChannel(v as typeof channel); setPage(0); }}>
             <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
@@ -83,7 +83,7 @@ function TemplateCard({ t, onSaved, channel, page }: { t: D['templates'][number]
   const vars = [...new Set([...`${t.title} ${t.body}`.matchAll(/\{(\w+)\}/g)].map((m) => m[1]))];
   return (
     <Card>
-      <CardHeader className="flex-row items-center justify-between space-y-0 pb-3">
+      <CardHeader className="flex-row flex-wrap items-center justify-between gap-2 space-y-0 pb-3">
         <CardTitle className="text-sm">{t.description}</CardTitle>
         <label className="flex items-center gap-1.5 text-xs"><Switch checked={v.isActive} onCheckedChange={(c) => setV({ ...v, isActive: c })} />فعال</label>
       </CardHeader>

@@ -47,7 +47,7 @@ export default function RemindersTab() {
       <Card>
         <CardHeader>
           <CardTitle className="text-base">اجرای روزانه</CardTitle>
-          <p className="text-sm text-muted-foreground">اجرای خودکار زمان‌بندی‌شده نیازمند پلن Business در Zite است؛ تا آن زمان اجرای روزانه را از این‌جا انجام دهید. «اجرای آزمایشی» فقط نتیجه را نشان می‌دهد و چیزی ارسال نمی‌کند.</p>
+          <p className="text-sm text-muted-foreground">اجرای روزانه روی سرور به‌صورت خودکار توسط زمان‌بند داخلی سرور (هر روز ساعت ۷ صبح به وقت تهران) انجام می‌شود. در صورت نیاز می‌توانید از این‌جا هم اجرا کنید. «اجرای آزمایشی» فقط نتیجه را نشان می‌دهد و چیزی ارسال نمی‌کند.</p>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="flex flex-wrap gap-2">
@@ -55,13 +55,13 @@ export default function RemindersTab() {
             <Button disabled={busy} onClick={() => run(false)}><Play className="h-4 w-4" />اجرای روزانه و ارسال</Button>
           </div>
           {res && (res.events.length === 0 ? <p className="text-sm text-muted-foreground">هیچ پرونده‌ای از مهلت عبور نکرده است.</p> : (
-            <Table>
+            <div className="overflow-x-auto"><Table className="min-w-[560px]">
               <TableHeader><TableRow><TableHead>پرونده</TableHead><TableHead>وضعیت</TableHead><TableHead>روز انتظار</TableHead><TableHead>مرحله</TableHead><TableHead>گیرنده</TableHead><TableHead>نتیجه</TableHead></TableRow></TableHeader>
               <TableBody>{res.events.map((e, i) => (
                 <TableRow key={i}><TableCell>{e.code}</TableCell><TableCell>{e.status}</TableCell><TableCell>{fa(e.days)}</TableCell><TableCell>{STAGE[e.stage]}</TableCell><TableCell>{fa(e.recipients)}</TableCell>
                   <TableCell>{e.duplicate ? <Badge variant="outline">قبلاً ارسال شده</Badge> : res.dryRun ? <Badge variant="secondary">ارسال می‌شود</Badge> : <Badge>ارسال شد</Badge>}</TableCell></TableRow>
               ))}</TableBody>
-            </Table>
+            </Table></div>
           ))}
         </CardContent>
       </Card>
@@ -80,21 +80,28 @@ function RuleRow({ r, d, onSaved }: { r?: Rule; d: D; onSaved: (d: D) => void })
       toast.success(op === 'save' ? 'قاعده ذخیره شد.' : 'قاعده حذف شد.');
     } catch (e) { toast.error(errMsg(e)); }
   };
-  const num = (k: 'notifyAfterDays' | 'remindAfterDays' | 'escalateAfterDays', ph: string) => <Input dir="ltr" inputMode="numeric" title={ph} placeholder={ph} value={v[k]} onChange={(e) => setV({ ...v, [k]: e.target.value.replace(/\D/g, '') })} />;
+  const num = (k: 'notifyAfterDays' | 'remindAfterDays' | 'escalateAfterDays', ph: string) => (
+    <label className="space-y-1 text-[11px] text-muted-foreground lg:space-y-0"><span className="lg:sr-only">{ph}</span>
+      <Input dir="ltr" inputMode="numeric" title={ph} placeholder={ph} value={v[k]} onChange={(e) => setV({ ...v, [k]: e.target.value.replace(/\D/g, '') })} /></label>
+  );
   return (
-    <div className="grid gap-2 md:grid-cols-[1.6fr_80px_80px_80px_1fr_auto_auto_auto] md:items-center">
+    <div className={`grid grid-cols-3 gap-2 rounded-xl border p-3 lg:grid-cols-[1.6fr_80px_80px_80px_1fr_auto_auto_auto] lg:items-center lg:rounded-none lg:border-0 lg:p-0 ${r ? '' : 'border-dashed bg-muted/30'}`}>
+      <div className="col-span-3 lg:col-span-1">
       <Select value={v.statusKey || undefined} onValueChange={(x) => setV({ ...v, statusKey: x })}>
         <SelectTrigger><SelectValue placeholder="وضعیت منتظر اقدام" /></SelectTrigger>
         <SelectContent>{d.statuses.map((s) => <SelectItem key={s.key} value={s.key}>{s.label}</SelectItem>)}</SelectContent>
       </Select>
+      </div>
       {num('notifyAfterDays', 'روز اعلان')}{num('remindAfterDays', 'روز یادآوری')}{num('escalateAfterDays', 'روز ارتقا')}
+      <div className="col-span-3 lg:col-span-1">
       <Select value={v.escalateToRole} onValueChange={(x) => setV({ ...v, escalateToRole: x })}>
         <SelectTrigger><SelectValue /></SelectTrigger>
         <SelectContent>{['group_manager', 'graduate_office', 'admin'].map((x) => <SelectItem key={x} value={x}>ارتقا به {ROLE_LABELS[x]}</SelectItem>)}</SelectContent>
       </Select>
+      </div>
       <label className="flex items-center gap-1.5 text-xs"><Switch checked={v.isActive} onCheckedChange={(c) => setV({ ...v, isActive: c })} />فعال</label>
       <Button variant={r ? 'outline' : 'default'} disabled={!valid} onClick={() => call('save')}>{r ? 'ذخیره' : 'افزودن'}</Button>
-      {r ? <Button variant="ghost" size="icon" aria-label="حذف" onClick={() => call('delete')}><Trash2 className="h-4 w-4" /></Button> : <span />}
+      {r ? <Button variant="ghost" size="icon" className="justify-self-end lg:justify-self-auto" aria-label="حذف" onClick={() => call('delete')}><Trash2 className="h-4 w-4" /></Button> : <span />}
     </div>
   );
 }

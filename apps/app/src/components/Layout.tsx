@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { cn } from '@project/components/lib/utils';
 import Logo from './Logo';
 import NotificationBell from './NotificationBell';
+import DevCredit from './DevCredit';
 import { useSession } from '../lib/session';
 import { ROLE_LABELS } from '../lib/format';
 
@@ -67,7 +68,7 @@ function SidebarBody({ items, onPick }: { items: Item[]; onPick?: () => void }) 
         ) : <div className="mt-1 text-xs text-sidebar-primary">{ROLE_LABELS[role] ?? role}</div>}
       </div>
       <div className="flex-1 overflow-y-auto"><NavList items={items} onPick={onPick} /></div>
-      <div className="space-y-0.5 text-[10px] leading-relaxed text-sidebar-foreground/50"><div>© ۱۴۰۵ دانشگاه شمال، معاونت پژوهش و فناوری — کلیه حقوق محفوظ است.</div><div>طراحی و توسعه: پارامیس تک</div></div>
+
     </div>
   );
 }
@@ -85,7 +86,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <aside className="sticky top-0 hidden h-screen lg:block"><SidebarBody items={items} /></aside>
       <div className="min-w-0">
         <header className="sticky top-0 z-30 border-b bg-card/90 backdrop-blur-md">
-          <div className="flex h-16 items-center gap-3 px-4 md:px-8">
+          <div className="flex h-14 items-center gap-2 px-3 sm:h-16 sm:gap-3 sm:px-4 md:px-8">
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild><Button variant="ghost" size="icon" className="lg:hidden" aria-label="منو"><Menu className="h-5 w-5" /></Button></SheetTrigger>
               <SheetContent side="right" className="w-72 border-0 p-0"><SidebarBody items={items} onPick={() => setOpen(false)} /></SheetContent>
@@ -105,7 +106,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </div>
           </div>
         </header>
-        <main className="mx-auto max-w-7xl px-4 py-6 md:px-8 md:py-8">{children}</main>
+        <main className="mx-auto max-w-7xl px-3 py-5 sm:px-4 md:px-8 md:py-8">{children}</main>
+        <footer className="mx-auto flex max-w-7xl flex-col items-center gap-3 border-t px-4 py-5 text-center text-[11px] text-muted-foreground sm:flex-row sm:justify-between sm:text-right md:px-8">
+          <span>© ۱۴۰۵ دانشگاه شمال، معاونت پژوهش و فناوری — کلیه حقوق محفوظ است.</span>
+          <DevCredit />
+        </footer>
       </div>
     </div>
   );

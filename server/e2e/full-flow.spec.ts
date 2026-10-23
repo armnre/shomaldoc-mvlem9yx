@@ -30,7 +30,7 @@ test.beforeAll(async () => {
 test('topic registration → graduation', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByText('© ۱۴۰۵ دانشگاه شمال، معاونت پژوهش و فناوری — کلیه حقوق محفوظ است.')).toBeVisible();
-  await expect(page.getByText('طراحی و توسعه: پارامیس تک')).toBeVisible();
+  await expect(page.getByRole('link', { name: 'طراحی و توسعه: پارامیس تک' })).toHaveAttribute('href', 'https://paramistech.ir/');
 
   // 1) Student: first login → forced password change (UI)
   await uiLogin(page, U('stu'), 'Temp12345a');

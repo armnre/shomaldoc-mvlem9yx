@@ -10,14 +10,16 @@ export default function AdminConfig() {
   const tab = sp.get('tab') ?? 'structure';
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-extrabold">پیکربندی سامانه</h1>
+      <h1 className="text-xl font-extrabold sm:text-2xl">پیکربندی سامانه</h1>
       <Tabs value={tab} onValueChange={(v) => setSp({ tab: v })} dir="rtl">
-        <TabsList className="flex h-auto flex-wrap justify-start">
-          <TabsTrigger value="structure">ساختار آموزشی</TabsTrigger>
-          <TabsTrigger value="form">فرم پروپوزال</TabsTrigger>
-          <TabsTrigger value="reminders">یادآوری و ارتقا</TabsTrigger>
-          <TabsTrigger value="templates">قالب‌ها و لاگ اعلان‌ها</TabsTrigger>
+        <div className="-mx-3 overflow-x-auto px-3 pb-1 sm:mx-0 sm:px-0">
+        <TabsList className="inline-flex h-auto w-max min-w-full justify-start gap-1 sm:min-w-0">
+          <TabsTrigger className="whitespace-nowrap" value="structure">ساختار آموزشی</TabsTrigger>
+          <TabsTrigger className="whitespace-nowrap" value="form">فرم پروپوزال</TabsTrigger>
+          <TabsTrigger className="whitespace-nowrap" value="reminders">یادآوری و ارتقا</TabsTrigger>
+          <TabsTrigger className="whitespace-nowrap" value="templates">قالب‌ها و لاگ اعلان‌ها</TabsTrigger>
         </TabsList>
+        </div>
         <TabsContent value="structure"><StructureTab /></TabsContent>
         <TabsContent value="form"><FormEditorTab /></TabsContent>
         <TabsContent value="reminders"><RemindersTab /></TabsContent>

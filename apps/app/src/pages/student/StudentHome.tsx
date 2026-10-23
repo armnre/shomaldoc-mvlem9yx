@@ -9,6 +9,7 @@ import { DefenseCard } from '../../components/DefenseCard';
 import { CaseHeader, ProcessCards, Timeline, Versions } from '../../components/CaseFile';
 import TopicForm from './TopicForm';
 import StudentJourney from '../../components/StudentJourney';
+import NextStepCard from '../../components/NextStepCard';
 import SupervisorPicker from './SupervisorPicker';
 import DocumentSubmit from './DocumentSubmit';
 import IranDocForm from './IranDocForm';
@@ -17,7 +18,7 @@ import TopicChangeForm from './TopicChangeForm';
 import { DefenseChangesCard, GraduationPanel, LockedBanner, TopicChangesCard } from '../../components/CaseExtras';
 
 const Notice = ({ icon: Icon, title, text, tone = 'text-primary' }: { icon: typeof Info; title: string; text: string; tone?: string }) => (
-  <Card><CardContent className="flex items-start gap-3 p-6"><Icon className={`mt-0.5 h-6 w-6 shrink-0 ${tone}`} />
+  <Card><CardContent className="flex items-start gap-3 p-4 sm:p-6"><Icon className={`mt-0.5 h-6 w-6 shrink-0 ${tone}`} />
     <div><div className="font-bold">{title}</div><p className="text-sm text-muted-foreground">{text}</p></div></CardContent></Card>
 );
 
@@ -56,18 +57,21 @@ export default function StudentHome() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 sm:space-y-6">
       {t && <CaseHeader t={t} />}
-      <StudentJourney status={s} />
+      <div className="grid items-start gap-5 sm:gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
+      <aside className="space-y-4 lg:sticky lg:top-24 lg:order-2"><StudentJourney status={s} /></aside>
+      <div className="min-w-0 space-y-5 sm:space-y-6 lg:order-1">
+      <NextStepCard status={s} />
       {['NONE', 'DRAFT', 'SUPERVISOR_REJECTED'].includes(s) && (
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid gap-5 xl:grid-cols-2">
           <TopicForm thesis={t} onSaved={load} />
           {t ? <SupervisorPicker onDone={load} rejected={s === 'SUPERVISOR_REJECTED'} /> :
             <Notice icon={Info} title="گام بعد: انتخاب استاد راهنما" text="ابتدا پیش‌نویس موضوع را ذخیره کنید." />}
         </div>
       )}
       {s === 'TOPIC_REVISION' && (
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid gap-5 xl:grid-cols-2">
           <TopicForm thesis={t} onSaved={load} />
           <DocumentSubmit kind="topic" lastComment={active('topic')?.reviewComment} onDone={load} />
         </div>
@@ -88,12 +92,14 @@ export default function StudentHome() {
       {t && <LockedBanner t={t} />}
       {t && <GraduationPanel thesisId={t.id} status={s} onChange={load} />}
       {['REJECTED', 'CANCELLED'].includes(s) && <Notice icon={XCircle} tone="text-destructive" title="پرونده بسته شده است" text="جزئیات و علت در تاریخچهٔ پرونده ثبت شده است." />}
+      </div>
+      </div>
       {t && <DefenseCard d={d} />}
       {t && <ProcessCards d={d} />}
       {t && <TopicChangesCard items={d.topicChanges} />}
       {t && <DefenseChangesCard items={d.defenseChanges} />}
       {t && (
-        <div className="grid gap-6 lg:grid-cols-3">
+        <div className="grid gap-5 sm:gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2"><Versions versions={d.versions} /></div>
           <Timeline items={d.timeline} requests={d.requests} />
         </div>

@@ -17,7 +17,7 @@ const Field = ({ label, value }: { label: string; value: string }) => (
 export function CaseHeader({ t }: { t: T }) {
   return (
     <Card>
-      <CardContent className="space-y-6 p-6">
+      <CardContent className="space-y-5 p-4 sm:space-y-6 sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="space-y-1">
             <div className="font-mono text-xs text-muted-foreground">{t.code}</div>
