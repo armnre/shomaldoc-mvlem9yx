@@ -1,3 +1,4 @@
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@project/components/ui/alert-dialog';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { FileCheck2, Gavel, ScanSearch, Download } from 'lucide-react';
@@ -83,20 +84,53 @@ export function ReviewForm({ reviewId, onDone }: { reviewId: string; onDone: () 
       onDone();
     } catch (e) { toast.error(errMsg(e)); } finally { setBusy(false); }
   };
+  const [confirm, setConfirm] = useState(false);
+  const opts = [
+    { k: 'approve' as const, d: 'قابل دفاع است', c: 'border-primary bg-primary/5' },
+    { k: 'revise' as const, d: 'پس از اصلاحات قابل دفاع است', c: 'border-sidebar-primary bg-accent/50' },
+    { k: 'reject' as const, d: 'قابل دفاع نیست', c: 'border-destructive bg-destructive/5' },
+  ];
+  const n = Number(score);
   return (
-    <Card className="border-primary/40">
-      <CardHeader><CardTitle className="flex items-center gap-2 text-base"><FileCheck2 className="h-4 w-4" /> ثبت نظر داوری</CardTitle></CardHeader>
-      <CardContent className="space-y-4">
-        <RadioGroup value={verdict} onValueChange={(v) => setVerdict(v as typeof verdict)} className="flex flex-wrap gap-4">
-          {(['approve', 'revise', 'reject'] as const).map((k) => (
-            <label key={k} className="flex items-center gap-2 text-sm"><RadioGroupItem value={k} />{VERDICT[k]}</label>
+    <Card className="border-2 border-sidebar-primary/50">
+      <CardHeader className="space-y-1">
+        <CardTitle className="flex items-center gap-2 text-base"><FileCheck2 className="h-5 w-5 text-sidebar-primary" /> ثبت نظر داوری</CardTitle>
+        <p className="text-xs text-muted-foreground">فایل پایان‌نامه را از بخش «نسخه‌ها» در پایین صفحه دریافت کنید. نظر پس از ثبت نهایی قابل ویرایش نیست.</p>
+      </CardHeader>
+      <CardContent className="space-y-5">
+        <RadioGroup value={verdict} onValueChange={(v) => setVerdict(v as typeof verdict)} className="grid gap-2 sm:grid-cols-3">
+          {opts.map((o) => (
+            <label key={o.k} className={`flex cursor-pointer items-start gap-2 rounded-xl border-2 p-3 transition-colors ${verdict === o.k ? o.c : 'border-border hover:bg-muted/50'}`}>
+              <RadioGroupItem value={o.k} className="mt-0.5" />
+              <span><span className="block text-sm font-bold">{VERDICT[o.k]}</span><span className="text-xs text-muted-foreground">{o.d}</span></span>
+            </label>
           ))}
         </RadioGroup>
-        <div className="space-y-1.5 sm:w-48"><Label htmlFor="rs">نمرهٔ پیشنهادی (از ۲۰)</Label><Input id="rs" type="number" dir="ltr" min={0} max={20} step="0.25" value={score} onChange={(e) => setScore(e.target.value)} /></div>
-        <div className="space-y-1.5"><Label htmlFor="rc">نظر و اصلاحات پیشنهادی</Label><Textarea id="rc" rows={6} value={comment} onChange={(e) => setComment(e.target.value)} /></div>
+        <div className="space-y-1.5 sm:w-56">
+          <Label htmlFor="rs">نمرهٔ پیشنهادی (۰ تا ۲۰)</Label>
+          <Input id="rs" type="number" dir="ltr" min={0} max={20} step="0.25" value={score} onChange={(e) => setScore(e.target.value)} aria-invalid={score !== '' && (n < 0 || n > 20)} />
+          {score !== '' && (n < 0 || n > 20) && <p className="text-xs text-destructive">نمره باید بین ۰ تا ۲۰ باشد.</p>}
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="rc">نظر و اصلاحات پیشنهادی</Label>
+          <Textarea id="rc" rows={6} value={comment} onChange={(e) => setComment(e.target.value)} placeholder="نقاط قوت، ایرادات و اصلاحات لازم را بنویسید…" />
+          <p className={`text-xs ${comment.trim().length >= 10 ? 'text-muted-foreground' : 'text-destructive/80'}`}>{fa(comment.trim().length)} نویسه — حداقل ۱۰ نویسه</p>
+        </div>
         <FileUploader files={files} onChange={setFiles} />
-        <Button disabled={!valid || busy} onClick={submit}>{busy ? 'در حال ثبت…' : 'ثبت نهایی نظر داوری'}</Button>
+        <Button className="w-full sm:w-auto" disabled={!valid || busy} onClick={() => setConfirm(true)}>{busy ? 'در حال ثبت…' : 'ثبت نهایی نظر داوری'}</Button>
       </CardContent>
+      <AlertDialog open={confirm} onOpenChange={setConfirm}>
+        <AlertDialogContent dir="rtl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>ثبت نهایی نظر داوری؟</AlertDialogTitle>
+            <AlertDialogDescription>نتیجه: «{VERDICT[verdict]}» با نمرهٔ {fa(score)}. پس از ثبت، امکان ویرایش وجود ندارد.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="gap-2">
+            <AlertDialogCancel>بازبینی</AlertDialogCancel>
+            <AlertDialogAction onClick={() => { setConfirm(false); submit(); }}>ثبت نهایی</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 }
