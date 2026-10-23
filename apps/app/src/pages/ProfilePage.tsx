@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@project/components/ui
 import { Badge } from '@project/components/ui/badge';
 import { Skeleton } from '@project/components/ui/skeleton';
 import PasswordForm from '../components/PasswordForm';
+import NotifyPrefsCard from '../components/NotifyPrefsCard';
 import { useSession } from '../lib/session';
 import { errMsg, fa, jalali, ROLE_LABELS } from '../lib/format';
 
@@ -40,6 +41,7 @@ export default function ProfilePage() {
         <CardHeader><CardTitle>تغییر رمز عبور</CardTitle></CardHeader>
         <CardContent><PasswordForm onDone={() => load()} /></CardContent>
       </Card>
+      <NotifyPrefsCard />
       <Card className="lg:col-span-2">
         <CardHeader><CardTitle>نشست‌های فعال</CardTitle></CardHeader>
         <CardContent className="space-y-2">
