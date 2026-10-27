@@ -4,19 +4,16 @@ import { z } from 'zod';
 import { toast } from 'sonner';
 import { saveThesisDraft, type ThesisDetailOutputType } from 'zitejs/api';
 import { Button } from '@project/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@project/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@project/components/ui/card';
 import { Input } from '@project/components/ui/input';
 import { Label } from '@project/components/ui/label';
-import { Textarea } from '@project/components/ui/textarea';
 import { errMsg } from '../../lib/format';
 import { useSession } from '../../lib/session';
 
+/** First stage: only the thesis topic. Literature review and proposal are unlocked by later workflow stages. */
 const schema = z.object({
-  titleFa: z.string().trim().min(5, 'عنوان فارسی حداقل ۵ نویسه').max(300),
-  titleEn: z.string().trim().max(300),
-  keywords: z.string().trim().min(2, 'حداقل یک کلیدواژه وارد کنید'),
-  problemStatement: z.string().trim().min(30, 'شرح مسئله حداقل ۳۰ نویسه'),
-  objectives: z.string().trim().min(20, 'اهداف حداقل ۲۰ نویسه'),
+  titleFa: z.string().trim().min(5, 'موضوع پایان‌نامه حداقل ۵ نویسه').max(300, 'حداکثر ۳۰۰ نویسه'),
+  titleEn: z.string().trim().max(300, 'حداکثر ۳۰۰ نویسه'),
 });
 type F = z.infer<typeof schema>;
 
@@ -25,32 +22,36 @@ export default function TopicForm({ thesis, onSaved }: { thesis: ThesisDetailOut
   const { register, handleSubmit, formState: { errors, isSubmitting, isValid, isDirty } } = useForm<F>({
     resolver: zodResolver(schema),
     mode: 'onChange',
-    defaultValues: {
-      titleFa: thesis?.titleFa ?? '', titleEn: thesis?.titleEn ?? '', keywords: thesis?.keywords ?? '',
-      problemStatement: thesis?.problemStatement ?? '', objectives: thesis?.objectives ?? '',
-    },
+    defaultValues: { titleFa: thesis?.titleFa ?? '', titleEn: thesis?.titleEn ?? '' },
   });
   const onSubmit = async (v: F) => {
     try {
       await saveThesisDraft({ token, ...v });
-      toast.success('پیش‌نویس موضوع ذخیره شد.');
+      toast.success('موضوع پایان‌نامه ذخیره شد. اکنون استاد راهنما را انتخاب کنید.');
       onSaved();
     } catch (e) {
       toast.error(errMsg(e));
     }
   };
-  const err = (k: keyof F) => errors[k] && <p className="text-xs text-destructive">{errors[k]?.message}</p>;
   return (
     <Card>
-      <CardHeader><CardTitle className="text-base">مشخصات موضوع پیشنهادی</CardTitle></CardHeader>
+      <CardHeader>
+        <CardTitle className="text-base">مرحلهٔ ۱: موضوع پایان‌نامه</CardTitle>
+        <CardDescription>در این مرحله فقط موضوع لازم است. پیشینهٔ تحقیق و پروپوزال پس از تأیید موضوع فعال می‌شوند.</CardDescription>
+      </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="space-y-1.5"><Label htmlFor="tf">عنوان فارسی</Label><Input id="tf" {...register('titleFa')} />{err('titleFa')}</div>
-          <div className="space-y-1.5"><Label htmlFor="te">عنوان انگلیسی</Label><Input id="te" dir="ltr" {...register('titleEn')} />{err('titleEn')}</div>
-          <div className="space-y-1.5"><Label htmlFor="kw">کلیدواژه‌ها (با ویرگول جدا کنید)</Label><Input id="kw" {...register('keywords')} />{err('keywords')}</div>
-          <div className="space-y-1.5"><Label htmlFor="ps">شرح مسئله</Label><Textarea id="ps" rows={5} {...register('problemStatement')} />{err('problemStatement')}</div>
-          <div className="space-y-1.5"><Label htmlFor="ob">اهداف</Label><Textarea id="ob" rows={4} {...register('objectives')} />{err('objectives')}</div>
-          <Button type="submit" disabled={!isValid || isSubmitting || (!!thesis && !isDirty)}>{isSubmitting ? 'در حال ذخیره…' : 'ذخیره پیش‌نویس'}</Button>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+          <div className="space-y-1.5">
+            <Label htmlFor="tf">موضوع پایان‌نامه (فارسی)</Label>
+            <Input id="tf" aria-invalid={!!errors.titleFa} aria-describedby="tf-err" {...register('titleFa')} />
+            {errors.titleFa && <p id="tf-err" className="text-xs text-destructive">{errors.titleFa.message}</p>}
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="te">عنوان انگلیسی (اختیاری)</Label>
+            <Input id="te" dir="ltr" {...register('titleEn')} />
+            {errors.titleEn && <p className="text-xs text-destructive">{errors.titleEn.message}</p>}
+          </div>
+          <Button type="submit" disabled={!isValid || isSubmitting || (!!thesis && !isDirty)}>{isSubmitting ? 'در حال ذخیره…' : 'ذخیرهٔ موضوع'}</Button>
         </form>
       </CardContent>
     </Card>

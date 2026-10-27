@@ -10,10 +10,10 @@ export default createEndpoint({
   inputSchema: z.object({
     token: z.string(),
     titleFa: z.string(),
-    titleEn: z.string(),
-    keywords: z.string(),
-    problemStatement: z.string(),
-    objectives: z.string(),
+    titleEn: z.string().optional(),
+    keywords: z.string().optional(),
+    problemStatement: z.string().optional(),
+    objectives: z.string().optional(),
   }),
   outputSchema: z.object({ thesisId: z.string() }),
   execute: async ({ input }) => {
@@ -22,9 +22,10 @@ export default createEndpoint({
     const dep = first(p.department);
     if (!dep) bad('گروه آموزشی شما هنوز توسط مدیر سیستم تعیین نشده است.');
     if (input.titleFa.trim().length < 5) bad('عنوان فارسی باید حداقل ۵ نویسه باشد.');
+    if (input.titleFa.trim().length > 300) bad('عنوان فارسی حداکثر ۳۰۰ نویسه است.');
     const rec = {
-      titleFa: input.titleFa.trim(), titleEn: input.titleEn.trim(), keywords: input.keywords.trim(),
-      problemStatement: input.problemStatement.trim(), objectives: input.objectives.trim(),
+      titleFa: input.titleFa.trim(), titleEn: input.titleEn?.trim() ?? '', keywords: input.keywords?.trim() ?? '',
+      problemStatement: input.problemStatement?.trim() ?? '', objectives: input.objectives?.trim() ?? '',
     };
     const existing = await findStudentThesis(p.id);
     if (existing) {
