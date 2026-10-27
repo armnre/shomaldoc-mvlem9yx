@@ -403,3 +403,19 @@ export function validateAnswers(fields: FormFieldDef[], answers: Record<string, 
     if (f.type === 'date' && isNaN(new Date(v).getTime())) bad(`تاریخ «${f.label}» نامعتبر است.`);
   }
 }
+
+// ---------- Master's programs (کارشناسی ارشد) ----------
+export const MASTERS_DEGREE = 'کارشناسی ارشد';
+/** Validates a program choice: must exist, be active, be a Master's program, and belong to the given faculty and major. */
+export async function validateMastersProgram(a: { programId: string; faculty: string; major: string }) {
+  const prog = await zite.programs.findOne({ id: a.programId });
+  if (!prog || prog.isActive === false) bad('رشته/گرایش انتخاب‌شده معتبر نیست.');
+  if (prog.degree !== MASTERS_DEGREE) bad('فقط رشته‌های مقطع کارشناسی ارشد مجاز هستند.');
+  if ((prog.faculty ?? '') !== a.faculty.trim()) bad('رشتهٔ انتخاب‌شده متعلق به این دانشکده نیست.');
+  if ((prog.name ?? '') !== a.major.trim()) bad('گرایش انتخاب‌شده متعلق به این رشته نیست.');
+  return prog;
+}
+/** Statuses in which the student may still change the program (before proposal approval). */
+export const PROGRAM_EDITABLE = ['DRAFT', 'WAITING_SUPERVISOR', 'SUPERVISOR_REJECTED', 'GROUP_ASSIGNMENT', 'GROUP_REVIEW', 'TOPIC_REVISION', 'LITERATURE_REVIEW', 'LITERATURE_REVISION', 'PROPOSAL_DRAFT', 'PROPOSAL_REVISION'];
+/** Statuses where the official proposal approval date may be recorded/corrected: after proposal approval, before the defense is scheduled. */
+export const APPROVAL_DATE_EDITABLE = ['IRANDOC_PENDING', 'IRANDOC_REVIEW', 'THESIS_ACTIVE', 'EXTENSION_REQUIRED', 'EXTENSION_REQUESTED', 'SPECIAL_COMMISSION', 'FINAL_SUPERVISOR_REVIEW', 'FINAL_REVISION', 'PLAGIARISM_CHECK', 'REVIEWER_ASSIGNMENT', 'REVIEWING', 'DEFENSE_SCHEDULING'];

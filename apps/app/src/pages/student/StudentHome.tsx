@@ -8,6 +8,8 @@ import { errMsg, fa, jalali, STEP_LABELS } from '../../lib/format';
 import { DefenseCard } from '../../components/DefenseCard';
 import { CaseHeader, ProcessCards, Timeline, Versions } from '../../components/CaseFile';
 import TopicForm from './TopicForm';
+import ProgramPicker from '../../components/ProgramPicker';
+import ApprovalDateCard from '../../components/ApprovalDateCard';
 import StudentJourney from '../../components/StudentJourney';
 import NextStepCard from '../../components/NextStepCard';
 import SupervisorPicker from './SupervisorPicker';
@@ -89,6 +91,8 @@ export default function StudentHome() {
       {d.topicChangeAllowed && t && <TopicChangeForm currentTitle={t.titleFa} onDone={load} />}
       {s === 'DEFENDED' && t && <Notice icon={Award} title="تبریک! دفاع شما با موفقیت ثبت شد" text={`نمره: ${fa(t.defenseScore ?? 0)} — درجه: ${t.defenseGrade}. صورتجلسه از بخش «جلسهٔ دفاع» قابل دریافت است.`} />}
       {s === 'THESIS_COMPLETED' && <Notice icon={Hourglass} title="پایان‌نامه تکمیل شد" text="تحصیلات تکمیلی به‌زودی فرآیند فارغ‌التحصیلی را آغاز می‌کند." />}
+      {t && d.canSetProgram && <ProgramPicker thesisId={t.id} initial={{ programId: t.programId, faculty: t.programFaculty, major: t.programMajor }} onDone={load} />}
+      {t && t.proposalApprovedAt && <ApprovalDateCard t={t} canEdit={false} onDone={load} />}
       {t && <LockedBanner t={t} />}
       {t && <GraduationPanel thesisId={t.id} status={s} onChange={load} />}
       {['REJECTED', 'CANCELLED'].includes(s) && <Notice icon={XCircle} tone="text-destructive" title="پرونده بسته شده است" text="جزئیات و علت در تاریخچهٔ پرونده ثبت شده است." />}

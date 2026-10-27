@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { createEndpoint } from 'zitejs/backend';
 import { zite, type ZiteAttachment } from 'zitejs/db';
-import { getSettings, STATUS_ORDER, allowedActions, canView, findStudentThesis, first, forbidden, has, profileNames, requireAuth } from '../lib/server';
+import { APPROVAL_DATE_EDITABLE, PROGRAM_EDITABLE, getSettings, STATUS_ORDER, allowedActions, canView, findStudentThesis, first, forbidden, has, profileNames, requireAuth } from '../lib/server';
 
 const fileOut = z.object({ url: z.string(), name: z.string() });
 const files = (a?: ZiteAttachment[]) => (a ?? []).map((f) => ({ url: f.url, name: f.originalName || f.filename }));
@@ -24,6 +24,7 @@ export default createEndpoint({
       similarityPercent: z.number().nullable(), plagiarismReport: z.array(fileOut), defenseDate: z.string(), defenseLocation: z.string(),
       defenseScore: z.number().nullable(), defenseGrade: z.string(), minutesPdf: z.array(fileOut), defendedAt: z.string(),
       isLocked: z.boolean(), completedAt: z.string(), graduatedAt: z.string(), programName: z.string(), formAnswers: z.string(),
+      approvalDateSetAt: z.string(), approvalDateSetBy: z.string(), programId: z.string(), programFaculty: z.string(), programMajor: z.string(),
     }).nullable(),
     topicChanges: z.array(z.object({ id: z.string(), oldTitle: z.string(), newTitle: z.string(), reason: z.string(), status: z.string(), decisions: z.string(), files: z.array(fileOut), createdAt: z.string() })),
     defenseChanges: z.array(z.object({ id: z.string(), oldDate: z.string(), newDate: z.string(), oldLocation: z.string(), newLocation: z.string(), reason: z.string(), changedBy: z.string(), createdAt: z.string() })),
@@ -45,11 +46,13 @@ export default createEndpoint({
     timeline: z.array(z.object({ id: z.string(), action: z.string(), actorName: z.string(), role: z.string(), from: z.string(), to: z.string(), comment: z.string(), at: z.string() })),
     allowedActions: z.array(z.string()),
     topicChangeAllowed: z.boolean(),
+    canSetApprovalDate: z.boolean(),
+    canSetProgram: z.boolean(),
   }),
   execute: async ({ input }) => {
     const p = await requireAuth(input.token);
     const t = input.thesisId ? await zite.theses.findOne({ id: input.thesisId }) : has(p, 'student') ? await findStudentThesis(p.id) : undefined;
-    if (!t) return { thesis: null, topicChanges: [], defenseChanges: [], reviews: [], versions: [] as z.infer<typeof version>[], requests: [], iranDoc: [] as never as { id: string; trackingCode: string; registeredOn: string; receipt: { url: string; name: string }[]; certificate: { url: string; name: string }[]; reviewStatus: string; reviewComment: string; isActive: boolean }[], extensions: [], timeline: [], allowedActions: [], topicChangeAllowed: false };
+    if (!t) return { thesis: null, topicChanges: [], defenseChanges: [], reviews: [], versions: [] as z.infer<typeof version>[], requests: [], iranDoc: [] as never as { id: string; trackingCode: string; registeredOn: string; receipt: { url: string; name: string }[]; certificate: { url: string; name: string }[]; reviewStatus: string; reviewComment: string; isActive: boolean }[], extensions: [], timeline: [], allowedActions: [], topicChangeAllowed: false, canSetApprovalDate: false, canSetProgram: false };
     if (!(await canView(p, t))) forbidden('دسترسی به این پرونده مجاز نیست.');
 
     const [{ records: vs }, { records: rs }, { records: logs }, { records: ids }, { records: ex }] = await Promise.all([
@@ -68,7 +71,7 @@ export default createEndpoint({
     const staff = !has(p, 'student') || t.studentId !== p.id;
     const names = await profileNames([
       s(t.studentId), s(t.supervisorId), s(t.advisorId), ...rs.map((r) => s(r.professorId)),
-      ...logs.map((l) => s(l.actorId)), ...vs.map((v) => s(v.submittedById)), ...dcs.map((d) => s(d.changedById)), ...rvs.map((r) => s(r.reviewerId)),
+      ...logs.map((l) => s(l.actorId)), s(t.approvalDateSetById), ...vs.map((v) => s(v.submittedById)), ...dcs.map((d) => s(d.changedById)), ...rvs.map((r) => s(r.reviewerId)),
     ]);
     const stu = t.studentId ? await zite.profiles.findOne({ id: t.studentId }) : undefined;
     const depId = first(t.department) ?? '';
@@ -86,6 +89,8 @@ export default createEndpoint({
         minutesPdf: files(t.minutesPdf), defendedAt: s(t.defendedAt),
         isLocked: !!t.isLocked, completedAt: s(t.completedAt), graduatedAt: s(t.graduatedAt),
         programName: prog ? `${prog.name ?? ''}${prog.specialization ? ' — ' + prog.specialization : ''} (${prog.degree ?? ''})` : '', formAnswers: s(t.formAnswers),
+        approvalDateSetAt: s(t.approvalDateSetAt), approvalDateSetBy: names[s(t.approvalDateSetById)] ?? '',
+        programId: prog?.id ?? '', programFaculty: s(prog?.faculty), programMajor: s(prog?.name),
       },
       topicChanges: tcs.map((c) => ({ id: c.id, oldTitle: s(c.oldTitle), newTitle: s(c.newTitle), reason: s(c.reason), status: s(c.changeStatus), decisions: s(c.decisions), files: files(c.files), createdAt: s(c.created) })).sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
       defenseChanges: dcs.map((d) => ({ id: d.id, oldDate: s(d.oldDate), newDate: s(d.newDate), oldLocation: s(d.oldLocation), newLocation: s(d.newLocation), reason: s(d.reason), changedBy: names[s(d.changedById)] ?? '', createdAt: s(d.created) })).sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
@@ -113,6 +118,8 @@ export default createEndpoint({
         comment: s(l.comment), at: s(l.created),
       })).sort((a, b) => b.at.localeCompare(a.at)),
       allowedActions: await allowedActions(p, t),
+      canSetApprovalDate: (has(p, 'graduate_office') || has(p, 'admin')) && !t.isLocked && APPROVAL_DATE_EDITABLE.includes(t.status ?? ''),
+      canSetProgram: t.studentId === p.id && !t.isLocked && PROGRAM_EDITABLE.includes(t.status ?? ''),
       topicChangeAllowed: t.studentId === p.id && !!t.topicApprovedAt && !t.isLocked && !tcs.some((c) => ['supervisor_review', 'group_review'].includes(c.changeStatus ?? ''))
         && STATUS_ORDER.indexOf(t.status ?? '') >= 0 && STATUS_ORDER.indexOf(t.status ?? '') <= STATUS_ORDER.indexOf((await getSettings()).topicChangeMaxStatus),
     };
