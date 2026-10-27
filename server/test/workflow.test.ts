@@ -51,7 +51,7 @@ describe('full workflow: topic → graduation', () => {
     const act = (token: string, action: string, extra: Record<string, unknown> = {}) => ok('thesisAction', { token, thesisId: id, action, ...extra });
     const allowed = async (token: string) => (await ok<{ allowedActions: string[] }>('thesisDetail', { token, thesisId: id })).allowedActions;
     const seen: string[] = [];
-    let checkedGap = false, checkedSim = false;
+    let checkedGap = false, checkedSim = false, programSet = false;
 
     for (let i = 0; i < 60; i++) {
       const s = (await status(id)).status as string;
@@ -65,7 +65,13 @@ describe('full workflow: topic → graduation', () => {
         case 'LITERATURE_REVIEW': await ok('submitDocument', { token: stu, kind: 'literature', content: 'پیشینهٔ تحقیق '.repeat(20), files }); break;
         case 'LITERATURE_SUPERVISOR_REVIEW': await act(sup, 'literature_approve'); break;
         case 'LITERATURE_GROUP_REVIEW': await act(gm, 'literature_gm_approve'); break;
-        case 'PROPOSAL_DRAFT': await ok('submitDocument', { token: stu, kind: 'proposal', content: 'متن پروپوزال '.repeat(20), files, formAnswers: {} }); break;
+        case 'PROPOSAL_DRAFT':
+          if (!programSet) {
+            programSet = true;
+            const pr = (await sql(`INSERT INTO "Programs"(name, degree, faculty, "isActive") VALUES ('مهندسی کامپیوتر','کارشناسی ارشد','دانشکده فنی',true) RETURNING id::text, name, faculty`)).rows[0];
+            await ok('setThesisProgram', { token: stu, thesisId: id, programId: pr.id, faculty: pr.faculty, major: pr.name });
+          }
+          await ok('submitDocument', { token: stu, kind: 'proposal', content: 'متن پروپوزال '.repeat(20), files, formAnswers: {} }); break;
         case 'PROPOSAL_REVIEW': {
           let done = false;
           for (const tk of [sup, gm, go]) if ((await allowed(tk)).includes('proposal_approve')) { await act(tk, 'proposal_approve'); done = true; break; }
