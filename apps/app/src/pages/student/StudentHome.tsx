@@ -14,6 +14,8 @@ import StudentJourney from '../../components/StudentJourney';
 import NextStepCard from '../../components/NextStepCard';
 import SupervisorPicker from './SupervisorPicker';
 import DocumentSubmit from './DocumentSubmit';
+import ProposalWizard from '../../components/ProposalWizard';
+import NextActorCard from '../../components/NextActorCard';
 import IranDocForm from './IranDocForm';
 import ExtensionForm from './ExtensionForm';
 import TopicChangeForm from './TopicChangeForm';
@@ -45,7 +47,8 @@ export default function StudentHome() {
     WAITING_SUPERVISOR: 'درخواست شما برای استاد راهنما ارسال شده و منتظر پاسخ اوست.',
     GROUP_ASSIGNMENT: 'به دلیل رد مکرر، مدیر گروه استاد راهنمای شما را تعیین خواهد کرد.',
     GROUP_REVIEW: 'موضوع و استاد راهنما در حال بررسی توسط مدیر گروه است.',
-    LITERATURE_SUPERVISOR_REVIEW: 'پیشینه تحقیق نزد استاد راهنما در حال بررسی است.',
+    LITERATURE_SUPERVISOR_REVIEW: 'پیشینه تحقیق نزد استاد راهنما در حال بررسی است (مرحلهٔ ۱ از ۲).',
+    LITERATURE_GROUP_REVIEW: 'پیشینه توسط استاد راهنما تأیید شد و نزد مدیر گروه برای تأیید نهایی است (مرحلهٔ ۲ از ۲).',
     PROPOSAL_REVIEW: `پروپوزال نزد ${step} در حال بررسی است.`,
     IRANDOC_REVIEW: 'اطلاعات ایرانداک نزد تحصیلات تکمیلی در حال بررسی است. پس از تأیید، پایان‌نامهٔ شما مصوب می‌شود.',
     SPECIAL_COMMISSION: 'درخواست شما در نوبت بررسی کمیسیون موارد خاص است.',
@@ -79,7 +82,7 @@ export default function StudentHome() {
         </div>
       )}
       {['LITERATURE_REVIEW', 'LITERATURE_REVISION'].includes(s) && <DocumentSubmit kind="literature" lastComment={active('literature')?.reviewComment} onDone={load} />}
-      {['PROPOSAL_DRAFT', 'PROPOSAL_REVISION'].includes(s) && <DocumentSubmit kind="proposal" lastComment={s === 'PROPOSAL_REVISION' ? active('proposal')?.reviewComment : undefined} onDone={load} />}
+      {['PROPOSAL_DRAFT', 'PROPOSAL_REVISION'].includes(s) && t && <ProposalWizard d={d} onDone={load} />}
       {s === 'IRANDOC_PENDING' && <IranDocForm lastComment={lastIranDoc?.reviewStatus === 'rejected' ? lastIranDoc.reviewComment : undefined} onDone={load} />}
       {s === 'EXTENSION_REQUIRED' && t && <ExtensionForm termsUsed={t.termsUsed} allowedTerms={t.allowedTerms} commissionTerm={me.commissionTermThreshold - 1} onDone={load} />}
       {waiting[s] && <Notice icon={Hourglass} title="در انتظار بررسی" text={waiting[s]} />}
@@ -91,7 +94,7 @@ export default function StudentHome() {
       {d.topicChangeAllowed && t && <TopicChangeForm currentTitle={t.titleFa} onDone={load} />}
       {s === 'DEFENDED' && t && <Notice icon={Award} title="تبریک! دفاع شما با موفقیت ثبت شد" text={`نمره: ${fa(t.defenseScore ?? 0)} — درجه: ${t.defenseGrade}. صورتجلسه از بخش «جلسهٔ دفاع» قابل دریافت است.`} />}
       {s === 'THESIS_COMPLETED' && <Notice icon={Hourglass} title="پایان‌نامه تکمیل شد" text="تحصیلات تکمیلی به‌زودی فرآیند فارغ‌التحصیلی را آغاز می‌کند." />}
-      {t && d.canSetProgram && <ProgramPicker thesisId={t.id} initial={{ programId: t.programId, faculty: t.programFaculty, major: t.programMajor }} onDone={load} />}
+      {t && d.canSetProgram && !['PROPOSAL_DRAFT', 'PROPOSAL_REVISION'].includes(s) && <ProgramPicker thesisId={t.id} initial={{ programId: t.programId, faculty: t.programFaculty, major: t.programMajor }} onDone={load} />}
       {t && t.proposalApprovedAt && <ApprovalDateCard t={t} canEdit={false} onDone={load} />}
       {t && <LockedBanner t={t} />}
       {t && <GraduationPanel thesisId={t.id} status={s} onChange={load} />}
@@ -99,6 +102,7 @@ export default function StudentHome() {
       </div>
       </div>
       {t && <DefenseCard d={d} />}
+      {t && <NextActorCard d={d} />}
       {t && <ProcessCards d={d} />}
       {t && <TopicChangesCard items={d.topicChanges} />}
       {t && <DefenseChangesCard items={d.defenseChanges} />}

@@ -64,6 +64,7 @@ describe('full workflow: topic → graduation', () => {
         case 'GROUP_REVIEW': await act(gm, 'group_approve_topic'); break;
         case 'LITERATURE_REVIEW': await ok('submitDocument', { token: stu, kind: 'literature', content: 'پیشینهٔ تحقیق '.repeat(20), files }); break;
         case 'LITERATURE_SUPERVISOR_REVIEW': await act(sup, 'literature_approve'); break;
+        case 'LITERATURE_GROUP_REVIEW': await act(gm, 'literature_gm_approve'); break;
         case 'PROPOSAL_DRAFT': await ok('submitDocument', { token: stu, kind: 'proposal', content: 'متن پروپوزال '.repeat(20), files, formAnswers: {} }); break;
         case 'PROPOSAL_REVIEW': {
           let done = false;

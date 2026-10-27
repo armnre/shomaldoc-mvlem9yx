@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@project/components/ui
 import ApprovalDateCard from '../components/ApprovalDateCard';
 import { CaseHeader, ProcessCards, Timeline, Versions } from '../components/CaseFile';
 import ActionPanel from '../components/ActionPanel';
+import NextActorCard from '../components/NextActorCard';
 import { DefenseChangesCard, GraduationPanel, LockedBanner, TopicChangesCard } from '../components/CaseExtras';
 import { DefenseCard, ReviewForm } from '../components/DefenseCard';
 import { errMsg } from '../lib/format';
@@ -48,6 +49,7 @@ export default function ThesisDetailPage() {
       <GraduationPanel thesisId={t.id} status={t.status} onChange={load} />
       <TopicChangesCard items={d.topicChanges} />
       <DefenseChangesCard items={d.defenseChanges} />
+      <NextActorCard d={d} />
       <ProcessCards d={d} />
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">

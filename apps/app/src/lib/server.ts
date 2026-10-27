@@ -511,8 +511,8 @@ export async function groupManagersOf(t: ThesesRecordType) {
   return records.filter((r) => r.roles?.includes('group_manager') && !r.disabled);
 }
 async function roleHolders(role: Role) {
-  const { records } = await zite.profiles.findAll({ filters: { roles: role }, limit: 200 });
-  return records.filter((r) => !r.disabled);
+  const { records } = await zite.profiles.findAll({ limit: 2000 });
+  return records.filter((r) => !r.disabled && r.roles?.includes(role));
 }
 const STEP_ROLE_FA: Record<string, string> = { supervisor: 'استاد راهنما', group_manager: 'مدیر گروه', graduate_office: 'تحصیلات تکمیلی', finance: 'امور مالی' };
 export type NextActor = { roleLabel: string; people: string[]; expected: string; where: string; personIds: string[] };

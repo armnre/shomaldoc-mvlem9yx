@@ -9,7 +9,7 @@ const STUDENT_TODO: Record<string, string> = {
   SUPERVISOR_REJECTED: 'استاد قبلی درخواست را نپذیرفت؛ استاد راهنمای دیگری انتخاب کنید.',
   TOPIC_REVISION: 'موضوع را مطابق نظر مدیر گروه اصلاح و دوباره ارسال کنید.',
   LITERATURE_REVIEW: 'فایل پیشینهٔ تحقیق را بارگذاری کنید.',
-  LITERATURE_REVISION: 'پیشینه را طبق نظر استاد راهنما اصلاح و ارسال کنید.',
+  LITERATURE_REVISION: 'پیشینه را طبق علت برگشت (استاد راهنما یا مدیر گروه) اصلاح و دوباره ارسال کنید.',
   PROPOSAL_DRAFT: 'فرم و فایل پروپوزال را تکمیل و ارسال کنید.',
   PROPOSAL_REVISION: 'پروپوزال را طبق نظرات اصلاح و دوباره ارسال کنید.',
   IRANDOC_PENDING: 'کد رهگیری و فایل ثبت ایرانداک را وارد کنید.',
@@ -19,7 +19,7 @@ const STUDENT_TODO: Record<string, string> = {
 };
 export const OWNER: Record<string, string> = {
   WAITING_SUPERVISOR: 'استاد راهنما', GROUP_ASSIGNMENT: 'مدیر گروه', GROUP_REVIEW: 'مدیر گروه',
-  LITERATURE_SUPERVISOR_REVIEW: 'استاد راهنما', PROPOSAL_REVIEW: 'زنجیرهٔ تأیید پروپوزال', IRANDOC_REVIEW: 'تحصیلات تکمیلی',
+  LITERATURE_SUPERVISOR_REVIEW: 'استاد راهنما', LITERATURE_GROUP_REVIEW: 'مدیر گروه', PROPOSAL_REVIEW: 'زنجیرهٔ تأیید پروپوزال', IRANDOC_REVIEW: 'تحصیلات تکمیلی',
   SPECIAL_COMMISSION: 'کمیسیون موارد خاص', EXTENSION_REQUESTED: 'زنجیرهٔ تأیید تمدید', FINAL_SUPERVISOR_REVIEW: 'استاد راهنما',
   PLAGIARISM_CHECK: 'تحصیلات تکمیلی', REVIEWER_ASSIGNMENT: 'مدیر گروه', REVIEWING: 'داوران',
   DEFENSE_SCHEDULING: 'تحصیلات تکمیلی', DEFENSE_SCHEDULED: 'هیئت داوران (جلسهٔ دفاع)', DEFENDED: 'تحصیلات تکمیلی',

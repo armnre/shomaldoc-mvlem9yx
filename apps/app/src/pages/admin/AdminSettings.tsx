@@ -25,7 +25,7 @@ export default function AdminSettings() {
   }, [token]);
   if (!items) return <Skeleton className="mx-auto h-80 max-w-3xl" />;
   const chains = items.filter((s) => s.kind === 'chain');
-  const invalid = chains.some((c) => !vals[c.key]) || items.some((s) => s.kind === 'list' && !vals[s.key]?.trim()) || items.some((s) => s.kind === 'int' && !(Number(vals[s.key]) >= 1));
+  const invalid = chains.some((c) => !vals[c.key]) || items.some((s) => s.kind === 'list' && !vals[s.key]?.trim()) || items.some((s) => s.kind === 'int' && !(Number(vals[s.key]) >= 1)) || items.some((s) => s.kind === 'count' && !/^\d+$/.test(vals[s.key] ?? ''));
   const save = async () => {
     const clean = Object.fromEntries(Object.entries(vals).map(([k, v]) => [k, items.find((i) => i.key === k)?.kind === 'list' ? v.split(',').map((x) => x.trim()).filter(Boolean).join(',') : v]));
     setBusy(true);
@@ -44,7 +44,7 @@ export default function AdminSettings() {
       <Card>
         <CardHeader><CardTitle>قواعد و مقادیر سامانه</CardTitle></CardHeader>
         <CardContent className="space-y-4">
-          {items.filter((s) => s.kind === 'int').map((s) => (
+          {items.filter((s) => s.kind === 'int' || s.kind === 'count').map((s) => (
             <div key={s.key} className="grid gap-1.5 sm:grid-cols-[1fr_140px] sm:items-center">
               <Label htmlFor={s.key}>{s.description}</Label>
               <Input id={s.key} dir="ltr" inputMode="numeric" value={vals[s.key] ?? ''} onChange={(e) => setVals({ ...vals, [s.key]: e.target.value.replace(/\D/g, '') })} />

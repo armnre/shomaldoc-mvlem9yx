@@ -12,7 +12,7 @@ const groups = (rows: DashboardStatsOutputType['byStatus']) => {
   return [
     { label: 'کل پرونده‌ها', value: rows.reduce((a, b) => a + b.count, 0) },
     { label: 'در مرحله موضوع/استاد', value: sum(['DRAFT', 'WAITING_SUPERVISOR', 'SUPERVISOR_REJECTED', 'GROUP_ASSIGNMENT', 'GROUP_REVIEW', 'TOPIC_REVISION']) },
-    { label: 'پیشینه، پروپوزال و ایرانداک', value: sum(['LITERATURE_REVIEW', 'LITERATURE_SUPERVISOR_REVIEW', 'LITERATURE_REVISION', 'PROPOSAL_DRAFT', 'PROPOSAL_REVIEW', 'PROPOSAL_REVISION', 'IRANDOC_PENDING', 'IRANDOC_REVIEW']) },
+    { label: 'پیشینه، پروپوزال و ایرانداک', value: sum(['LITERATURE_REVIEW', 'LITERATURE_SUPERVISOR_REVIEW', 'LITERATURE_GROUP_REVIEW', 'LITERATURE_REVISION', 'PROPOSAL_DRAFT', 'PROPOSAL_REVIEW', 'PROPOSAL_REVISION', 'IRANDOC_PENDING', 'IRANDOC_REVIEW']) },
     { label: 'مصوب و در حال نگارش', value: sum(['PROPOSAL_APPROVED', 'THESIS_ACTIVE', 'EXTENSION_REQUIRED', 'EXTENSION_REQUESTED', 'SPECIAL_COMMISSION']) },
     { label: 'داوری و دفاع', value: sum(['FINAL_SUPERVISOR_REVIEW', 'PLAGIARISM_CHECK', 'FINAL_REVISION', 'REVIEWER_ASSIGNMENT', 'REVIEWING', 'DEFENSE_SCHEDULING', 'DEFENSE_SCHEDULED']) },
     { label: 'دفاع‌شده / فارغ‌التحصیل', value: sum(['DEFENDED', 'THESIS_COMPLETED', 'GRADUATION_PROCESS', 'GRADUATED']) },

@@ -92,7 +92,8 @@ test('topic registration → graduation', async ({ page, browser }) => {
       case 'WAITING_SUPERVISOR': await uiAct(browser, U('sup'), id, 'پذیرش راهنمایی'); break;
       case 'GROUP_REVIEW': await uiAct(browser, U('gm'), id, 'تأیید موضوع'); break;
       case 'LITERATURE_REVIEW': await ok('submitDocument', { token: stu, kind: 'literature', content: 'پیشینهٔ تحقیق '.repeat(20), files }); break;
-      case 'LITERATURE_SUPERVISOR_REVIEW': await uiAct(browser, U('sup'), id, 'تأیید پیشینه'); break;
+      case 'LITERATURE_SUPERVISOR_REVIEW': await uiAct(browser, U('sup'), id, 'تأیید پیشینه (استاد راهنما)'); break;
+      case 'LITERATURE_GROUP_REVIEW': await uiAct(browser, U('gm'), id, 'تأیید نهایی پیشینه'); break;
       case 'PROPOSAL_DRAFT': await ok('submitDocument', { token: stu, kind: 'proposal', content: 'متن پروپوزال '.repeat(20), files, formAnswers: {} }); break;
       case 'PROPOSAL_REVIEW':
         for (const tk of [sup, gm, go]) {

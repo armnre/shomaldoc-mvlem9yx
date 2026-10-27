@@ -1,5 +1,4 @@
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm, type Resolver } from 'react-hook-form';
 import { z } from 'zod';
 import { toast } from 'sonner';
 import { saveThesisDraft, type ThesisDetailOutputType } from 'zitejs/api';
@@ -16,11 +15,17 @@ const schema = z.object({
   titleEn: z.string().trim().max(300, 'حداکثر ۳۰۰ نویسه'),
 });
 type F = z.infer<typeof schema>;
+/** Plain zod resolver (avoids the @hookform/resolvers ↔ local zod major-version type mismatch). */
+const resolver: Resolver<F> = async (values) => {
+  const r = schema.safeParse(values);
+  if (r.success) return { values: r.data, errors: {} };
+  return { values: {}, errors: Object.fromEntries(r.error.issues.map((i) => [String(i.path[0]), { type: 'zod', message: i.message }])) };
+};
 
 export default function TopicForm({ thesis, onSaved }: { thesis: ThesisDetailOutputType['thesis']; onSaved: () => void }) {
   const { token } = useSession();
   const { register, handleSubmit, formState: { errors, isSubmitting, isValid, isDirty } } = useForm<F>({
-    resolver: zodResolver(schema),
+    resolver,
     mode: 'onChange',
     defaultValues: { titleFa: thesis?.titleFa ?? '', titleEn: thesis?.titleEn ?? '' },
   });
