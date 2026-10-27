@@ -160,6 +160,12 @@
    "proposalApprovedAt": {
     "kind": "datetime"
    },
+   "approvalDateSetById": {
+    "kind": "text"
+   },
+   "approvalDateSetAt": {
+    "kind": "datetime"
+   },
    "supervisorRequests": {
     "kind": "link",
     "table": "SupervisorRequestsTheses",
@@ -636,6 +642,9 @@
    },
    "isActive": {
     "kind": "boolean"
+   },
+   "faculty": {
+    "kind": "text"
    },
    "profiles": {
     "kind": "link",

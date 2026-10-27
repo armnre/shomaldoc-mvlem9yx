@@ -207,6 +207,10 @@ export type ThesesRecordType = {
   topicApprovedAt?: string;
   /** "Proposal Approved At". Date+time field (ISO 8601 timestamp), null when unset, date: "local" format, time: 12h */
   proposalApprovedAt?: string;
+  /** "Approval Date Set By". Profile id of who manually recorded the official proposal approval date */
+  approvalDateSetById?: string;
+  /** "Approval Date Set At". Date+time field (ISO 8601 timestamp), system time the official date was recorded */
+  approvalDateSetAt?: string;
   /** Links to supervisorRequests ("Supervisor Requests"). "Supervisor Requests" */
   supervisorRequests?: string | string[];
   /** Links to documentVersions ("Document Versions"). "Document Versions" */
@@ -270,6 +274,8 @@ export type ThesesRecordInput = {
   supervisorRejections: string | number | null;
   topicApprovedAt: string | Date | null;
   proposalApprovedAt: string | Date | null;
+  approvalDateSetById?: string | null;
+  approvalDateSetAt?: string | Date | null;
   supervisorRequests: string | string[] | null;
   documentVersions: string | string[] | null;
   auditLogs: string | string[] | null;
@@ -603,6 +609,8 @@ export type ProgramsRecordType = {
   /** Links to departments ("Departments"). "Department" */
   department?: string | string[];
   isActive?: boolean;
+  /** "Faculty". Faculty name from the official programs list */
+  faculty?: string;
   /** Links to profiles ("Profiles"). "Profiles" */
   profiles?: string | string[];
   /** Links to theses ("Theses"). "Theses" */
@@ -616,6 +624,7 @@ export type ProgramsRecordInput = {
   degree: "کارشناسی ارشد" | "دکتری" | string | null;
   department: string | string[] | null;
   isActive: string | boolean | null;
+  faculty?: string | null;
   profiles: string | string[] | null;
   theses: string | string[] | null;
 };

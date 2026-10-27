@@ -72,6 +72,8 @@ CREATE TABLE IF NOT EXISTS "Theses" (
   "supervisorRejections" double precision,
   "topicApprovedAt" timestamptz,
   "proposalApprovedAt" timestamptz,
+  "approvalDateSetById" text,
+  "approvalDateSetAt" timestamptz,
   "studentId" text,
   "supervisorId" text,
   "advisorId" text,
@@ -102,6 +104,8 @@ ALTER TABLE "Theses" ADD COLUMN IF NOT EXISTS "proposalStep" text;
 ALTER TABLE "Theses" ADD COLUMN IF NOT EXISTS "supervisorRejections" double precision;
 ALTER TABLE "Theses" ADD COLUMN IF NOT EXISTS "topicApprovedAt" timestamptz;
 ALTER TABLE "Theses" ADD COLUMN IF NOT EXISTS "proposalApprovedAt" timestamptz;
+ALTER TABLE "Theses" ADD COLUMN IF NOT EXISTS "approvalDateSetById" text;
+ALTER TABLE "Theses" ADD COLUMN IF NOT EXISTS "approvalDateSetAt" timestamptz;
 ALTER TABLE "Theses" ADD COLUMN IF NOT EXISTS "studentId" text;
 ALTER TABLE "Theses" ADD COLUMN IF NOT EXISTS "supervisorId" text;
 ALTER TABLE "Theses" ADD COLUMN IF NOT EXISTS "advisorId" text;
@@ -344,12 +348,14 @@ CREATE TABLE IF NOT EXISTS "Programs" (
   "name" text,
   "specialization" text,
   "degree" text,
-  "isActive" boolean
+  "isActive" boolean,
+  "faculty" text
 );
 ALTER TABLE "Programs" ADD COLUMN IF NOT EXISTS "name" text;
 ALTER TABLE "Programs" ADD COLUMN IF NOT EXISTS "specialization" text;
 ALTER TABLE "Programs" ADD COLUMN IF NOT EXISTS "degree" text;
 ALTER TABLE "Programs" ADD COLUMN IF NOT EXISTS "isActive" boolean;
+ALTER TABLE "Programs" ADD COLUMN IF NOT EXISTS "faculty" text;
 
 CREATE TABLE IF NOT EXISTS "DynamicForms" (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
