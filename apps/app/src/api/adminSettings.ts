@@ -5,7 +5,7 @@ import { audit, bad, getSettings, requireAuth, SETTING_DEFAULTS, STATUS_FA, STAT
 
 export default createEndpoint({
   description: 'Admin: reads and optionally updates configurable system settings and approval chains',
-  inputSchema: z.object({ token: z.string(), updates: z.record(z.string()).optional() }),
+  inputSchema: z.object({ token: z.string(), updates: z.record(z.string(), z.string()).optional() }),
   outputSchema: z.object({
     settings: z.array(z.object({ key: z.string(), value: z.string(), description: z.string(), kind: z.string() })),
     statuses: z.array(z.object({ key: z.string(), label: z.string() })),

@@ -17,7 +17,7 @@ export default createEndpoint({
     kind: z.enum(['topic', 'literature', 'proposal', 'final']),
     content: z.string(),
     files: z.array(z.object({ url: z.string(), filename: z.string() })),
-    formAnswers: z.record(z.string()).optional(),
+    formAnswers: z.record(z.string(), z.string()).optional(),
   }),
   outputSchema: z.object({ ok: z.boolean() }),
   execute: async ({ input }) => {
