@@ -9,7 +9,7 @@ export default defineConfig({
   workers: 1,
   reporter: [['list']],
   use: { baseURL: `http://127.0.0.1:${PORT}`, locale: 'fa-IR', trace: 'retain-on-failure', screenshot: 'only-on-failure' },
-  projects: [{ name: 'chromium', use: { browserName: 'chromium' } }],
+  projects: [{ name: 'chromium', use: { browserName: 'chromium', launchOptions: { executablePath: process.env.PW_CHROMIUM_PATH || undefined } } }],
   webServer: {
     command: 'npx tsx --tsconfig tsconfig.json src/index.ts',
     url: `http://127.0.0.1:${PORT}/healthz`,
