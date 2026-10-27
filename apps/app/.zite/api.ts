@@ -5,6 +5,7 @@ import { createCaller } from 'zitejs/caller';
 import type { default as _ListMastersProgramsEp } from '../src/api/listMastersPrograms';
 import type { default as _SetProposalApprovalDateEp } from '../src/api/setProposalApprovalDate';
 import type { default as _SetThesisProgramEp } from '../src/api/setThesisProgram';
+import type { default as _SaveProposalDraftEp } from '../src/api/saveProposalDraft';
 import type { default as _AcademicTermsEp } from '../src/api/academicTerms';
 import type { default as _AdminAuditLogEp } from '../src/api/adminAuditLog';
 import type { default as _AdminListUsersEp } from '../src/api/adminListUsers';
@@ -249,6 +250,10 @@ type _SetThesisProgramCfg = typeof _SetThesisProgramEp;
 export type SetThesisProgramInputType = NonNullable<_SetThesisProgramCfg['inputSchema']> extends { _input: infer I } ? I : Parameters<_SetThesisProgramCfg['execute']>[0]['input'];
 export type SetThesisProgramOutputType = Awaited<ReturnType<_SetThesisProgramCfg['execute']>>;
 export const setThesisProgram = createCaller<SetThesisProgramInputType, SetThesisProgramOutputType>('setThesisProgram');
+type _SaveProposalDraftCfg = typeof _SaveProposalDraftEp;
+export type SaveProposalDraftInputType = NonNullable<_SaveProposalDraftCfg['inputSchema']> extends { _input: infer I } ? I : Parameters<_SaveProposalDraftCfg['execute']>[0]['input'];
+export type SaveProposalDraftOutputType = Awaited<ReturnType<_SaveProposalDraftCfg['execute']>>;
+export const saveProposalDraft = createCaller<SaveProposalDraftInputType, SaveProposalDraftOutputType>('saveProposalDraft');
 type _SetProposalApprovalDateCfg = typeof _SetProposalApprovalDateEp;
 export type SetProposalApprovalDateInputType = NonNullable<_SetProposalApprovalDateCfg['inputSchema']> extends { _input: infer I } ? I : Parameters<_SetProposalApprovalDateCfg['execute']>[0]['input'];
 export type SetProposalApprovalDateOutputType = Awaited<ReturnType<_SetProposalApprovalDateCfg['execute']>>;
@@ -303,4 +308,5 @@ export const api = {
   listMastersPrograms,
   setProposalApprovalDate,
   setThesisProgram,
+  saveProposalDraft,
 };

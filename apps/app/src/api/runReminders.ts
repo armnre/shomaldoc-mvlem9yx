@@ -21,7 +21,7 @@ async function responsible(t: ThesesRecordType): Promise<{ ids: string[]; role: 
     return { ids: records.map((r) => r.professorId ?? ''), role: 'professor' };
   }
   if (['LITERATURE_SUPERVISOR_REVIEW', 'FINAL_SUPERVISOR_REVIEW', 'DEFENDED'].includes(s)) return { ids: [t.supervisorId ?? ''], role: 'professor' };
-  if (['GROUP_ASSIGNMENT', 'GROUP_REVIEW', 'REVIEWER_ASSIGNMENT'].includes(s)) return { ids: await usersWithRole('group_manager', dep), role: 'group_manager' };
+  if (['GROUP_ASSIGNMENT', 'GROUP_REVIEW', 'LITERATURE_GROUP_REVIEW', 'REVIEWER_ASSIGNMENT'].includes(s)) return { ids: await usersWithRole('group_manager', dep), role: 'group_manager' };
   if (['IRANDOC_REVIEW', 'PLAGIARISM_CHECK', 'DEFENSE_SCHEDULING', 'SPECIAL_COMMISSION', 'THESIS_COMPLETED', 'GRADUATION_PROCESS'].includes(s)) return { ids: await usersWithRole('graduate_office'), role: 'graduate_office' };
   if (s === 'REVIEWING') {
     const { records } = await zite.reviews.findAll({ filters: { thesis: t.id, verdict: 'pending' }, limit: 20 });

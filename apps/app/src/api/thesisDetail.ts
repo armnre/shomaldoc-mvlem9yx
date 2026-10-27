@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { createEndpoint } from 'zitejs/backend';
 import { zite, type ZiteAttachment } from 'zitejs/db';
-import { APPROVAL_DATE_EDITABLE, PROGRAM_EDITABLE, getSettings, STATUS_ORDER, allowedActions, canView, findStudentThesis, first, forbidden, has, profileNames, requireAuth } from '../lib/server';
+import { countSetting, nextActor, APPROVAL_DATE_EDITABLE, PROGRAM_EDITABLE, getSettings, STATUS_ORDER, allowedActions, canView, findStudentThesis, first, forbidden, has, profileNames, requireAuth } from '../lib/server';
 
 const fileOut = z.object({ url: z.string(), name: z.string() });
 const files = (a?: ZiteAttachment[]) => (a ?? []).map((f) => ({ url: f.url, name: f.originalName || f.filename }));
@@ -48,11 +48,18 @@ export default createEndpoint({
     topicChangeAllowed: z.boolean(),
     canSetApprovalDate: z.boolean(),
     canSetProgram: z.boolean(),
+    committee: z.array(z.object({
+      id: z.string(), professorId: z.string(), name: z.string(), role: z.string(), position: z.number(), isActive: z.boolean(),
+      assignedBy: z.string(), assignedAt: z.string(), removedBy: z.string(), removedAt: z.string(),
+    })),
+    committeeLimits: z.object({ maxSupervisors: z.number(), maxAdvisors: z.number() }),
+    proposalDraft: z.string(),
+    nextActor: z.object({ roleLabel: z.string(), people: z.array(z.string()), expected: z.string(), where: z.string(), isMe: z.boolean() }).nullable(),
   }),
   execute: async ({ input }) => {
     const p = await requireAuth(input.token);
     const t = input.thesisId ? await zite.theses.findOne({ id: input.thesisId }) : has(p, 'student') ? await findStudentThesis(p.id) : undefined;
-    if (!t) return { thesis: null, topicChanges: [], defenseChanges: [], reviews: [], versions: [] as z.infer<typeof version>[], requests: [], iranDoc: [] as never as { id: string; trackingCode: string; registeredOn: string; receipt: { url: string; name: string }[]; certificate: { url: string; name: string }[]; reviewStatus: string; reviewComment: string; isActive: boolean }[], extensions: [], timeline: [], allowedActions: [], topicChangeAllowed: false, canSetApprovalDate: false, canSetProgram: false };
+    if (!t) return { thesis: null, topicChanges: [], defenseChanges: [], reviews: [], versions: [] as z.infer<typeof version>[], requests: [], iranDoc: [] as never as { id: string; trackingCode: string; registeredOn: string; receipt: { url: string; name: string }[]; certificate: { url: string; name: string }[]; reviewStatus: string; reviewComment: string; isActive: boolean }[], extensions: [], timeline: [], allowedActions: [], topicChangeAllowed: false, canSetApprovalDate: false, canSetProgram: false, committee: [], committeeLimits: { maxSupervisors: await countSetting('maxSupervisors'), maxAdvisors: await countSetting('maxAdvisors') }, proposalDraft: '', nextActor: null };
     if (!(await canView(p, t))) forbidden('دسترسی به این پرونده مجاز نیست.');
 
     const [{ records: vs }, { records: rs }, { records: logs }, { records: ids }, { records: ex }] = await Promise.all([
@@ -67,11 +74,14 @@ export default createEndpoint({
       zite.topicChanges.findAll({ filters: { thesis: t.id }, limit: 50 }),
       zite.defenseChanges.findAll({ filters: { thesis: t.id }, limit: 50 }),
     ]);
+    const { records: cm } = await zite.thesisCommittee.findAll({ filters: { thesisId: t.id }, limit: 200 });
+    const next = await nextActor(t);
     const prog = first(t.program) ? await zite.programs.findOne({ id: first(t.program)! }) : undefined;
     const staff = !has(p, 'student') || t.studentId !== p.id;
     const names = await profileNames([
       s(t.studentId), s(t.supervisorId), s(t.advisorId), ...rs.map((r) => s(r.professorId)),
       ...logs.map((l) => s(l.actorId)), s(t.approvalDateSetById), ...vs.map((v) => s(v.submittedById)), ...dcs.map((d) => s(d.changedById)), ...rvs.map((r) => s(r.reviewerId)),
+      ...cm.flatMap((c) => [s(c.professorId), s(c.assignedById), s(c.removedById)]),
     ]);
     const stu = t.studentId ? await zite.profiles.findOne({ id: t.studentId }) : undefined;
     const depId = first(t.department) ?? '';
@@ -118,6 +128,18 @@ export default createEndpoint({
         comment: s(l.comment), at: s(l.created),
       })).sort((a, b) => b.at.localeCompare(a.at)),
       allowedActions: await allowedActions(p, t),
+      committee: [
+        ...(t.supervisorId ? [{ id: 'primary', professorId: t.supervisorId, name: names[t.supervisorId] ?? '', role: 'supervisor', position: 1, isActive: true, assignedBy: '', assignedAt: s(t.topicApprovedAt), removedBy: '', removedAt: '' }] : []),
+        // Legacy advisor (set before the committee table existed) is shown as advisor #1.
+        ...(t.advisorId && !cm.some((c) => c.isActive && c.committeeRole === 'advisor') ? [{ id: 'legacy-advisor', professorId: t.advisorId, name: names[t.advisorId] ?? '', role: 'advisor', position: 1, isActive: true, assignedBy: '', assignedAt: '', removedBy: '', removedAt: '' }] : []),
+        ...cm.map((c) => ({
+          id: c.id, professorId: s(c.professorId), name: names[s(c.professorId)] ?? '', role: s(c.committeeRole), position: c.position ?? 0, isActive: !!c.isActive,
+          assignedBy: names[s(c.assignedById)] ?? '', assignedAt: s(c.assignedAt), removedBy: names[s(c.removedById)] ?? '', removedAt: s(c.removedAt),
+        })),
+      ].sort((a, b) => Number(b.isActive) - Number(a.isActive) || a.role.localeCompare(b.role) || a.position - b.position),
+      committeeLimits: { maxSupervisors: await countSetting('maxSupervisors'), maxAdvisors: await countSetting('maxAdvisors') },
+      proposalDraft: t.studentId === p.id ? s(t.proposalDraft) : '',
+      nextActor: next ? { roleLabel: next.roleLabel, people: next.people, expected: next.expected, where: next.where, isMe: next.personIds.includes(p.id) } : null,
       canSetApprovalDate: (has(p, 'graduate_office') || has(p, 'admin')) && !t.isLocked && APPROVAL_DATE_EDITABLE.includes(t.status ?? ''),
       canSetProgram: t.studentId === p.id && !t.isLocked && PROGRAM_EDITABLE.includes(t.status ?? ''),
       topicChangeAllowed: t.studentId === p.id && !!t.topicApprovedAt && !t.isLocked && !tcs.some((c) => ['supervisor_review', 'group_review'].includes(c.changeStatus ?? ''))

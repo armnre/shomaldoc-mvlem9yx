@@ -74,6 +74,7 @@ CREATE TABLE IF NOT EXISTS "Theses" (
   "proposalApprovedAt" timestamptz,
   "approvalDateSetById" text,
   "approvalDateSetAt" timestamptz,
+  "proposalDraft" text,
   "studentId" text,
   "supervisorId" text,
   "advisorId" text,
@@ -106,6 +107,7 @@ ALTER TABLE "Theses" ADD COLUMN IF NOT EXISTS "topicApprovedAt" timestamptz;
 ALTER TABLE "Theses" ADD COLUMN IF NOT EXISTS "proposalApprovedAt" timestamptz;
 ALTER TABLE "Theses" ADD COLUMN IF NOT EXISTS "approvalDateSetById" text;
 ALTER TABLE "Theses" ADD COLUMN IF NOT EXISTS "approvalDateSetAt" timestamptz;
+ALTER TABLE "Theses" ADD COLUMN IF NOT EXISTS "proposalDraft" text;
 ALTER TABLE "Theses" ADD COLUMN IF NOT EXISTS "studentId" text;
 ALTER TABLE "Theses" ADD COLUMN IF NOT EXISTS "supervisorId" text;
 ALTER TABLE "Theses" ADD COLUMN IF NOT EXISTS "advisorId" text;
@@ -536,6 +538,36 @@ ALTER TABLE "NotificationLogs" ADD COLUMN IF NOT EXISTS "body" text;
 ALTER TABLE "NotificationLogs" ADD COLUMN IF NOT EXISTS "deliveryStatus" text;
 ALTER TABLE "NotificationLogs" ADD COLUMN IF NOT EXISTS "error" text;
 ALTER TABLE "NotificationLogs" ADD COLUMN IF NOT EXISTS "created" timestamptz NOT NULL DEFAULT now();
+
+CREATE TABLE IF NOT EXISTS "ThesisCommittee" (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  "label" text,
+  "thesisId" text,
+  "professorId" text,
+  "committeeRole" text,
+  "position" double precision,
+  "isActive" boolean,
+  "assignedById" text,
+  "assignedAt" timestamptz,
+  "removedById" text,
+  "removedAt" timestamptz,
+  "note" text,
+  "created" timestamptz NOT NULL DEFAULT now()
+);
+ALTER TABLE "ThesisCommittee" ADD COLUMN IF NOT EXISTS "label" text;
+ALTER TABLE "ThesisCommittee" ADD COLUMN IF NOT EXISTS "thesisId" text;
+ALTER TABLE "ThesisCommittee" ADD COLUMN IF NOT EXISTS "professorId" text;
+ALTER TABLE "ThesisCommittee" ADD COLUMN IF NOT EXISTS "committeeRole" text;
+ALTER TABLE "ThesisCommittee" ADD COLUMN IF NOT EXISTS "position" double precision;
+ALTER TABLE "ThesisCommittee" ADD COLUMN IF NOT EXISTS "isActive" boolean;
+ALTER TABLE "ThesisCommittee" ADD COLUMN IF NOT EXISTS "assignedById" text;
+ALTER TABLE "ThesisCommittee" ADD COLUMN IF NOT EXISTS "assignedAt" timestamptz;
+ALTER TABLE "ThesisCommittee" ADD COLUMN IF NOT EXISTS "removedById" text;
+ALTER TABLE "ThesisCommittee" ADD COLUMN IF NOT EXISTS "removedAt" timestamptz;
+ALTER TABLE "ThesisCommittee" ADD COLUMN IF NOT EXISTS "note" text;
+ALTER TABLE "ThesisCommittee" ADD COLUMN IF NOT EXISTS "created" timestamptz NOT NULL DEFAULT now();
 
 CREATE TABLE IF NOT EXISTS "DepartmentsProfiles" (
   "departmentsId" uuid NOT NULL REFERENCES "Departments"(id) ON DELETE CASCADE,

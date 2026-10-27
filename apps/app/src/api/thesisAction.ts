@@ -7,6 +7,7 @@ import { getSettingsList } from '../lib/server';
 import {
   ACTIONS, allowedActions, audit, bad, chainSetting, first, forbidden, intSetting, parseChain,
   remainingCapacity, requireAuth, reviewActiveVersion, profileNames, notifyT, newVersion, fdate, has, type ActionKey,
+  withThesisLock, activeCommittee, validateCommittee, applyCommittee, groupManagersOf,
 } from '../lib/server';
 
 async function latestReviews(thesisId: string) {
@@ -16,7 +17,7 @@ async function latestReviews(thesisId: string) {
 }
 
 const NEEDS_COMMENT: ActionKey[] = [
-  'supervisor_reject', 'group_topic_revision', 'group_reject', 'literature_revision', 'proposal_revision',
+  'supervisor_reject', 'group_topic_revision', 'group_reject', 'literature_revision', 'literature_gm_revision', 'proposal_revision',
   'irandoc_reject', 'commission_approve', 'commission_reject', 'extension_reject', 'cancel', 'final_revision', 'plagiarism_fail',
   'topic_change_reject', 'reschedule_defense', 'reopen_case',
 ];
@@ -40,6 +41,8 @@ export default createEndpoint({
   outputSchema: z.object({ status: z.string() }),
   execute: async ({ input }) => {
     const p = await requireAuth(input.token);
+    // All checks and the transition run under a per-thesis lock: a duplicate or concurrent request re-reads the new status and is rejected.
+    return withThesisLock(input.thesisId, async () => {
     const t = await zite.theses.findOne({ id: input.thesisId });
     if (!t) bad('پرونده یافت نشد.');
     if (!(await allowedActions(p, t)).includes(input.action)) forbidden('این گذار در وضعیت فعلی یا برای نقش شما مجاز نیست.');
@@ -62,6 +65,14 @@ export default createEndpoint({
       const e = await zite.extensions.findOne({ filters: { thesis: t.id, extensionStatus: status } });
       if (!e) bad('درخواست تمدید فعال یافت نشد.');
       return e;
+    };
+    /** Sets/replaces the first advisor while keeping the rest of the committee; limits and eligibility are enforced server-side. */
+    const setFirstAdvisor = async (advisorId: string | null) => {
+      const c = await activeCommittee(t);
+      const rest = c.advisors.slice(1).filter((x) => x !== advisorId);
+      const advisors = advisorId ? [advisorId, ...rest] : rest;
+      await validateCommittee(t, c.supervisors.slice(1), advisors);
+      await applyCommittee(t, c.supervisors.slice(1), advisors, p, 'group_manager');
     };
     const vars = () => ({ code: t.thesisCode ?? '', title: t.titleFa ?? '' });
     /** Validates a defense slot: future, min gap after proposal approval (exception only by graduate office/admin, audited), no overlap. */
@@ -127,7 +138,7 @@ export default createEndpoint({
         if (input.targetId) {
           await pickProfessor();
           if (input.targetId === t.supervisorId) bad('مشاور نمی‌تواند همان استاد راهنما باشد.');
-          upd.advisorId = input.targetId;
+          await setFirstAdvisor(input.targetId);
         }
         upd.topicApprovedAt = now;
         await reviewActiveVersion(t.id, 'topic', 'approved', comment);
@@ -145,14 +156,29 @@ export default createEndpoint({
           await pickProfessor();
           if (input.targetId === t.supervisorId) bad('مشاور نمی‌تواند همان استاد راهنما باشد.');
         }
-        upd.advisorId = input.targetId ?? null;
+        await setFirstAdvisor(input.targetId ?? null);
         break;
+      // Literature review — step 1 of 2: the case's supervisor. Approval does NOT finish the stage; it forwards to the group manager.
       case 'literature_approve':
-      case 'literature_revision':
+      case 'literature_revision': {
         role = 'supervisor';
-        await reviewActiveVersion(t.id, 'literature', input.action === 'literature_approve' ? 'approved' : 'revision', comment);
-        to = input.action === 'literature_approve' ? 'PROPOSAL_DRAFT' : 'LITERATURE_REVISION';
+        const ok = input.action === 'literature_approve';
+        await reviewActiveVersion(t.id, 'literature', ok ? 'supervisor_approved' : 'revision', comment);
+        to = ok ? 'LITERATURE_GROUP_REVIEW' : 'LITERATURE_REVISION';
+        if (ok) await notifyT((await groupManagersOf(t)).map((g) => g.id), 'generic', { subject: `پیشینهٔ پرونده ${t.thesisCode ?? ''} منتظر بررسی مدیر گروه`, body: `پیشینهٔ تحقیق «${t.titleFa ?? ''}» توسط استاد راهنما تأیید شد و برای تأیید نهایی به شما ارجاع شد.` }, t.id);
         break;
+      }
+      // Literature review — step 2 of 2: the group manager of the case's department. Only this approval opens the proposal stage.
+      case 'literature_gm_approve':
+      case 'literature_gm_revision': {
+        role = 'group_manager';
+        const v = await zite.documentVersions.findOne({ filters: { thesis: t.id, kind: 'literature', isActive: true } });
+        if (!v || v.reviewStatus !== 'supervisor_approved') bad('پیشینهٔ فعلی هنوز توسط استاد راهنما تأیید نشده است.');
+        const ok = input.action === 'literature_gm_approve';
+        await reviewActiveVersion(t.id, 'literature', ok ? 'approved' : 'revision', comment);
+        to = ok ? 'PROPOSAL_DRAFT' : 'LITERATURE_REVISION';
+        break;
+      }
       case 'proposal_approve': {
         role = t.proposalStep ?? '';
         const chain = await chainSetting('proposalApprovalChain');
@@ -408,5 +434,6 @@ ${rv.map((r) => `<tr><td>${r.reviewerType === 'external' ? 'داور خارجی'
     await zite.theses.update({ id: t.id, record: upd });
     if (!input.action.startsWith('topic_change')) await audit({ action: input.action, actor: p.id, role, thesisId: t.id, from, to, comment: comment || undefined });
     return { status: to };
+    });
   },
 });
