@@ -14,13 +14,16 @@ import { useSession } from '../lib/session';
 import { ACTION_LABELS, errMsg, fa } from '../lib/format';
 
 type Action = ThesisActionInputType['action'];
-const NEEDS_COMMENT: Action[] = ['supervisor_reject', 'group_topic_revision', 'group_reject', 'literature_revision', 'proposal_revision', 'irandoc_reject', 'commission_approve', 'commission_reject', 'extension_reject', 'cancel', 'final_revision', 'plagiarism_fail', 'topic_change_reject', 'reschedule_defense', 'reopen_case'];
+const NEEDS_COMMENT: Action[] = ['supervisor_reject', 'group_topic_revision', 'group_reject', 'literature_revision', 'literature_gm_revision', 'proposal_revision', 'irandoc_reject', 'commission_approve', 'commission_reject', 'extension_reject', 'cancel', 'final_revision', 'plagiarism_fail', 'topic_change_reject', 'reschedule_defense', 'reopen_case'];
 const NEEDS_PROF: Action[] = ['group_assign_supervisor'];
 const OPTIONAL_PROF: Action[] = ['group_approve_topic', 'set_advisor'];
 const WITH_FILES: Action[] = ['irandoc_approve', 'commission_approve', 'commission_reject', 'plagiarism_pass', 'plagiarism_fail', 'confirm_completion'];
-const DANGER: Action[] = ['topic_change_reject', 'reopen_case', 'supervisor_reject', 'group_reject', 'cancel', 'group_topic_revision', 'literature_revision', 'proposal_revision', 'irandoc_reject', 'commission_reject', 'extension_reject', 'final_revision', 'plagiarism_fail'];
+const DANGER: Action[] = ['topic_change_reject', 'reopen_case', 'supervisor_reject', 'group_reject', 'cancel', 'group_topic_revision', 'literature_revision', 'literature_gm_revision', 'proposal_revision', 'irandoc_reject', 'commission_reject', 'extension_reject', 'final_revision', 'plagiarism_fail'];
 const REJECT_REASONS = ['تکمیل ظرفیت', 'عدم تناسب موضوع با تخصص', 'نیاز به تعریف دقیق‌تر موضوع'];
 const HINTS: Partial<Record<Action, string>> = {
+  literature_approve: 'تأیید شما مرحلهٔ ۱ از ۲ است؛ پیشینه برای تأیید نهایی به مدیر گروه ارجاع می‌شود.',
+  literature_gm_approve: 'با تأیید نهایی مدیر گروه، مرحلهٔ تدوین و ارسال پروپوزال برای دانشجو فعال می‌شود.',
+  literature_gm_revision: 'علت برگشت برای دانشجو نمایش داده می‌شود؛ نسخهٔ اصلاح‌شده دوباره از استاد راهنما شروع می‌شود.',
   irandoc_approve: 'با تأیید، پیش‌شرط‌های تصویب نهایی (موضوع، راهنما، پروپوزال و فایل آن، کد/رسید/گواهی ایرانداک) به‌طور خودکار بررسی و در صورت کامل‌بودن، پایان‌نامه مصوب می‌شود. اگر گواهی توسط دانشجو بارگذاری نشده، آن را اینجا پیوست کنید.',
   commission_approve: 'نتیجه و صورتجلسهٔ کمیسیون موارد خاص را ثبت کنید. پس از موافقت، درخواست تمدید وارد زنجیرهٔ تأیید می‌شود.',
   commission_reject: 'با مخالفت کمیسیون، پرونده رد می‌شود.',

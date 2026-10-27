@@ -6,8 +6,10 @@ import { OWNER } from '../components/NextStepCard';
 import { thesisDetail, type ThesisDetailOutputType } from 'zitejs/api';
 import { Skeleton } from '@project/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@project/components/ui/card';
+import ApprovalDateCard from '../components/ApprovalDateCard';
 import { CaseHeader, ProcessCards, Timeline, Versions } from '../components/CaseFile';
 import ActionPanel from '../components/ActionPanel';
+import NextActorCard from '../components/NextActorCard';
 import { DefenseChangesCard, GraduationPanel, LockedBanner, TopicChangesCard } from '../components/CaseExtras';
 import { DefenseCard, ReviewForm } from '../components/DefenseCard';
 import { errMsg } from '../lib/format';
@@ -42,10 +44,12 @@ export default function ThesisDetailPage() {
       )}
       <ActionPanel thesisId={t.id} departmentId={t.departmentId} supervisorId={t.supervisorId} actions={d.allowedActions} onDone={load} />
       {(() => { const mine = d.reviews.find((r) => r.mine && r.verdict === 'pending'); return mine && t.status === 'REVIEWING' ? <ReviewForm reviewId={mine.id} onDone={load} /> : null; })()}
+      <ApprovalDateCard t={t} canEdit={d.canSetApprovalDate} onDone={load} />
       <DefenseCard d={d} />
       <GraduationPanel thesisId={t.id} status={t.status} onChange={load} />
       <TopicChangesCard items={d.topicChanges} />
       <DefenseChangesCard items={d.defenseChanges} />
+      <NextActorCard d={d} />
       <ProcessCards d={d} />
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">

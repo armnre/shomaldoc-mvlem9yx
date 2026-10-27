@@ -27,6 +27,7 @@ const HOOKS = globalThis as unknown as {
   __shomalPbkdf2Iter?: number;
   __shomalInternalKey?: string;
   __shomalWithProfileLock?: <T>(profileId: string, fn: () => Promise<T>) => Promise<T>;
+  __shomalWithThesisLock?: <T>(thesisId: string, fn: () => Promise<T>) => Promise<T>;
 };
 const ITER = HOOKS.__shomalPbkdf2Iter ?? 100_000;
 /** True when a stored hash uses fewer iterations than the current target. */
@@ -37,6 +38,10 @@ export function needsRehash(stored?: string) {
 /** Serialises work per professor. On the self-hosted server this is SELECT ... FOR UPDATE on the profile row. */
 export function withProfileLock<T>(profileId: string, fn: () => Promise<T>): Promise<T> {
   return HOOKS.__shomalWithProfileLock ? HOOKS.__shomalWithProfileLock(profileId, fn) : fn();
+}
+/** Serialises workflow transitions per thesis (SELECT ... FOR UPDATE on the self-hosted server) so duplicate/concurrent requests cannot apply two transitions from the same status. */
+export function withThesisLock<T>(thesisId: string, fn: () => Promise<T>): Promise<T> {
+  return HOOKS.__shomalWithThesisLock ? HOOKS.__shomalWithThesisLock(thesisId, fn) : fn();
 }
 /** Scheduled jobs on the self-hosted server pass a per-boot random key instead of a user session. */
 export function isInternalCall(token: string) {
@@ -99,7 +104,7 @@ export async function requireAuth(token: string, roles?: Role[]) {
 export const has = (p: Profile, r: Role) => !!p.roles?.includes(r);
 
 // ---------- Settings ----------
-export const SETTING_DEFAULTS: Record<string, { value: string; description: string; kind: 'int' | 'chain' | 'status' | 'list' }> = {
+export const SETTING_DEFAULTS: Record<string, { value: string; description: string; kind: 'int' | 'chain' | 'status' | 'list' | 'count'; min?: number; max?: number }> = {
   maxSupervisorRejections: { value: '3', description: 'تعداد رد استاد پیش از ارجاع خودکار به مدیر گروه', kind: 'int' },
   baseAllowedTerms: { value: '4', description: 'تعداد ترم مجاز پایان‌نامه پس از تصویب (بدون تمدید)', kind: 'int' },
   commissionTermThreshold: { value: '6', description: 'از این ترم به بعد تمدید نیازمند کمیسیون موارد خاص است', kind: 'int' },
@@ -114,6 +119,10 @@ export const SETTING_DEFAULTS: Record<string, { value: string; description: stri
   defenseSlotHours: { value: '2', description: 'مدت هر جلسهٔ دفاع برای کنترل تداخل (ساعت)', kind: 'int' },
   topicChangeMaxStatus: { value: 'THESIS_ACTIVE', description: 'آخرین مرحله‌ای که دانشجو می‌تواند درخواست تغییر موضوع بدهد', kind: 'status' },
   topicChangeChain: { value: 'supervisor,group_manager', description: 'ترتیب تأیید تغییر موضوع', kind: 'chain' },
+  // Defaults mirror the pre-existing data model (one supervisorId + one advisorId on Theses); they are NOT a university rule.
+  // An authorised admin sets the approved values. min/max are technical bounds only.
+  maxSupervisors: { value: '1', description: 'حداکثر تعداد استاد راهنما در هر پرونده (شامل راهنمای اول)', kind: 'count', min: 1, max: 5 },
+  maxAdvisors: { value: '1', description: 'حداکثر تعداد استاد مشاور در هر پرونده (۰ یعنی بدون مشاور)', kind: 'count', min: 0, max: 5 },
   graduationChecklist: { value: 'تسویه‌حساب کتابخانه,تسویه‌حساب مالی,تحویل نسخهٔ نهایی صحافی‌شده,گواهی ثبت پایان‌نامه در ایرانداک,فرم تأیید اصلاحات توسط استاد راهنما', description: 'چک‌لیست مدارک فارغ‌التحصیلی (با ویرگول جدا شود)', kind: 'list' },
 };
 export const STEPS: Step[] = ['supervisor', 'group_manager', 'graduate_office', 'finance'];
@@ -132,6 +141,11 @@ export async function chainSetting(key: string) {
 }
 export async function intSetting(key: string) {
   return Number((await getSettings())[key]) || Number(SETTING_DEFAULTS[key].value);
+}
+/** Integer setting where 0 is a legitimate value (e.g. maxAdvisors). */
+export async function countSetting(key: string) {
+  const v = Number((await getSettings())[key]);
+  return Number.isInteger(v) && v >= 0 ? v : Number(SETTING_DEFAULTS[key].value);
 }
 
 // ---------- Audit ----------
@@ -154,7 +168,7 @@ export async function audit(a: { action: string; actor: string; role: string; th
 // ---------- Notifications ----------
 export const STATUS_FA: Record<string, string> = {
   WAITING_SUPERVISOR: 'در انتظار استاد راهنما', SUPERVISOR_REJECTED: 'رد توسط استاد', GROUP_ASSIGNMENT: 'تخصیص استاد توسط گروه',
-  GROUP_REVIEW: 'بررسی گروه', TOPIC_REVISION: 'اصلاح موضوع', LITERATURE_REVIEW: 'نگارش پیشینه', LITERATURE_SUPERVISOR_REVIEW: 'بررسی پیشینه',
+  GROUP_REVIEW: 'بررسی گروه', TOPIC_REVISION: 'اصلاح موضوع', LITERATURE_REVIEW: 'نگارش پیشینه', LITERATURE_SUPERVISOR_REVIEW: 'بررسی پیشینه توسط استاد راهنما', LITERATURE_GROUP_REVIEW: 'بررسی پیشینه توسط مدیر گروه',
   LITERATURE_REVISION: 'اصلاح پیشینه', PROPOSAL_DRAFT: 'تدوین پروپوزال', PROPOSAL_REVIEW: 'بررسی پروپوزال', PROPOSAL_REVISION: 'اصلاح پروپوزال',
   IRANDOC_PENDING: 'ثبت ایرانداک', IRANDOC_REVIEW: 'بررسی ایرانداک', THESIS_ACTIVE: 'مصوب و فعال', EXTENSION_REQUIRED: 'نیازمند تمدید',
   EXTENSION_REQUESTED: 'بررسی تمدید', SPECIAL_COMMISSION: 'کمیسیون موارد خاص', FINAL_SUPERVISOR_REVIEW: 'بررسی نسخهٔ نهایی توسط راهنما',
@@ -163,7 +177,7 @@ export const STATUS_FA: Record<string, string> = {
 };
 export const STATUS_ORDER = [
   'DRAFT', 'WAITING_SUPERVISOR', 'SUPERVISOR_REJECTED', 'GROUP_ASSIGNMENT', 'GROUP_REVIEW', 'TOPIC_REVISION', 'LITERATURE_REVIEW',
-  'LITERATURE_SUPERVISOR_REVIEW', 'LITERATURE_REVISION', 'PROPOSAL_DRAFT', 'PROPOSAL_REVIEW', 'PROPOSAL_REVISION', 'IRANDOC_PENDING',
+  'LITERATURE_SUPERVISOR_REVIEW', 'LITERATURE_GROUP_REVIEW', 'LITERATURE_REVISION', 'PROPOSAL_DRAFT', 'PROPOSAL_REVIEW', 'PROPOSAL_REVISION', 'IRANDOC_PENDING',
   'IRANDOC_REVIEW', 'THESIS_ACTIVE', 'EXTENSION_REQUIRED', 'EXTENSION_REQUESTED', 'SPECIAL_COMMISSION', 'FINAL_SUPERVISOR_REVIEW',
   'FINAL_REVISION', 'PLAGIARISM_CHECK', 'REVIEWER_ASSIGNMENT', 'REVIEWING', 'DEFENSE_SCHEDULING', 'DEFENSE_SCHEDULED', 'DEFENDED',
   'THESIS_COMPLETED', 'GRADUATION_PROCESS', 'GRADUATED',
@@ -273,6 +287,7 @@ const FINANCE_VISIBLE = ['EXTENSION_REQUESTED', 'SPECIAL_COMMISSION', 'EXTENSION
 export async function canView(p: Profile, t: ThesesRecordType) {
   if (has(p, 'admin') || has(p, 'graduate_office')) return true;
   if (t.studentId === p.id || t.supervisorId === p.id || t.advisorId === p.id) return true;
+  if (await zite.thesisCommittee.findOne({ filters: { thesisId: t.id, professorId: p.id, isActive: true } })) return true;
   if (has(p, 'group_manager') && first(p.department) && first(p.department) === first(t.department)) return true;
   if (has(p, 'finance') && FINANCE_VISIBLE.includes(t.status ?? '')) return true;
   if (await zite.reviews.findOne({ filters: { thesis: t.id, reviewerId: p.id } })) return true;
@@ -296,7 +311,7 @@ export function stepAllowed(step: string | undefined, p: Profile, t: ThesesRecor
 // ---------- Workflow: allowed actions (single source of truth for UI and enforcement) ----------
 export const ACTIONS = [
   'supervisor_accept', 'supervisor_reject', 'group_assign_supervisor', 'group_approve_topic', 'group_topic_revision',
-  'group_reject', 'set_advisor', 'literature_approve', 'literature_revision', 'proposal_approve', 'proposal_revision',
+  'group_reject', 'set_advisor', 'literature_approve', 'literature_revision', 'literature_gm_approve', 'literature_gm_revision', 'proposal_approve', 'proposal_revision',
   'irandoc_approve', 'irandoc_reject', 'commission_approve', 'commission_reject', 'extension_approve', 'extension_reject',
   'final_approve', 'final_revision', 'plagiarism_pass', 'plagiarism_fail', 'assign_reviewers', 'schedule_defense', 'record_defense', 'cancel',
   'topic_change_approve', 'topic_change_reject', 'reschedule_defense', 'confirm_completion', 'start_graduation', 'graduate', 'reopen_case',
@@ -319,6 +334,7 @@ export async function allowedActions(p: Profile, t: ThesesRecordType): Promise<A
     if (t.supervisorId && !['REJECTED', 'CANCELLED'].includes(s ?? '')) out.push('set_advisor');
   }
   if (isSup && s === 'LITERATURE_SUPERVISOR_REVIEW') out.push('literature_approve', 'literature_revision');
+  if (isGM && s === 'LITERATURE_GROUP_REVIEW') out.push('literature_gm_approve', 'literature_gm_revision');
   if (s === 'PROPOSAL_REVIEW' && stepAllowed(t.proposalStep, p, t)) out.push('proposal_approve', 'proposal_revision');
   if (s === 'IRANDOC_REVIEW' && has(p, 'graduate_office')) out.push('irandoc_approve', 'irandoc_reject');
   if (s === 'SPECIAL_COMMISSION' && has(p, 'graduate_office')) {
@@ -355,7 +371,7 @@ export async function newVersion(a: { thesisId: string; kind: 'topic' | 'literat
     },
   });
 }
-export async function reviewActiveVersion(thesisId: string, kind: string, status: 'approved' | 'revision', comment?: string) {
+export async function reviewActiveVersion(thesisId: string, kind: string, status: 'approved' | 'revision' | 'supervisor_approved', comment?: string) {
   const v = await zite.documentVersions.findOne({ filters: { thesis: thesisId, kind, isActive: true } });
   if (v) await zite.documentVersions.update({ id: v.id, record: { reviewStatus: status, reviewComment: comment ?? null } });
 }
@@ -402,4 +418,145 @@ export function validateAnswers(fields: FormFieldDef[], answers: Record<string, 
     if (f.type === 'select' && !f.options.includes(v)) bad(`گزینهٔ «${f.label}» نامعتبر است.`);
     if (f.type === 'date' && isNaN(new Date(v).getTime())) bad(`تاریخ «${f.label}» نامعتبر است.`);
   }
+}
+
+// ---------- Master's programs (کارشناسی ارشد) ----------
+export const MASTERS_DEGREE = 'کارشناسی ارشد';
+/** Validates a program choice: must exist, be active, be a Master's program, and belong to the given faculty and major. */
+export async function validateMastersProgram(a: { programId: string; faculty: string; major: string }) {
+  const prog = await zite.programs.findOne({ id: a.programId });
+  if (!prog || prog.isActive === false) bad('رشته/گرایش انتخاب‌شده معتبر نیست.');
+  if (prog.degree !== MASTERS_DEGREE) bad('فقط رشته‌های مقطع کارشناسی ارشد مجاز هستند.');
+  if ((prog.faculty ?? '') !== a.faculty.trim()) bad('رشتهٔ انتخاب‌شده متعلق به این دانشکده نیست.');
+  if ((prog.name ?? '') !== a.major.trim()) bad('گرایش انتخاب‌شده متعلق به این رشته نیست.');
+  return prog;
+}
+/** Statuses in which the student may still change the program (before proposal approval). */
+export const PROGRAM_EDITABLE = ['DRAFT', 'WAITING_SUPERVISOR', 'SUPERVISOR_REJECTED', 'GROUP_ASSIGNMENT', 'GROUP_REVIEW', 'TOPIC_REVISION', 'LITERATURE_REVIEW', 'LITERATURE_SUPERVISOR_REVIEW', 'LITERATURE_GROUP_REVIEW', 'LITERATURE_REVISION', 'PROPOSAL_DRAFT', 'PROPOSAL_REVISION'];
+/** Statuses where the official proposal approval date may be recorded/corrected: after proposal approval, before the defense is scheduled. */
+export const APPROVAL_DATE_EDITABLE = ['IRANDOC_PENDING', 'IRANDOC_REVIEW', 'THESIS_ACTIVE', 'EXTENSION_REQUIRED', 'EXTENSION_REQUESTED', 'SPECIAL_COMMISSION', 'FINAL_SUPERVISOR_REVIEW', 'FINAL_REVISION', 'PLAGIARISM_CHECK', 'REVIEWER_ASSIGNMENT', 'REVIEWING', 'DEFENSE_SCHEDULING'];
+
+// ---------- Thesis committee (supervisors / advisors) ----------
+export type CommitteeRole = 'supervisor' | 'advisor';
+/** Active committee = primary supervisor (Theses.supervisorId) + active ThesisCommittee rows, ordered by position. */
+export async function activeCommittee(t: ThesesRecordType) {
+  const { records } = await zite.thesisCommittee.findAll({ filters: { thesisId: t.id, isActive: true }, limit: 50 });
+  const sorted = records.sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
+  const extraSupervisors = sorted.filter((r) => r.committeeRole === 'supervisor' && r.professorId !== t.supervisorId).map((r) => r.professorId!);
+  let advisors = sorted.filter((r) => r.committeeRole === 'advisor').map((r) => r.professorId!);
+  // Legacy cases: advisor stored only on Theses.advisorId.
+  if (!advisors.length && t.advisorId) advisors = [t.advisorId];
+  return { supervisors: [t.supervisorId, ...extraSupervisors].filter((x): x is string => !!x), advisors };
+}
+
+/** Validates a proposed committee against the admin-configured limits and the professor profiles. Enforced server-side. */
+export async function validateCommittee(t: ThesesRecordType, coSupervisorIds: string[], advisorIds: string[]) {
+  if (!t.supervisorId) bad('استاد راهنمای اول هنوز برای این پرونده تعیین نشده است.');
+  const maxSup = await countSetting('maxSupervisors');
+  const maxAdv = await countSetting('maxAdvisors');
+  if (1 + coSupervisorIds.length > maxSup) bad(`حداکثر ${maxSup} استاد راهنما (شامل راهنمای اول) مجاز است.`);
+  if (advisorIds.length > maxAdv) bad(maxAdv === 0 ? 'طبق تنظیمات فعلی، تعیین استاد مشاور مجاز نیست.' : `حداکثر ${maxAdv} استاد مشاور مجاز است.`);
+  const all = [t.supervisorId, ...coSupervisorIds, ...advisorIds];
+  if (new Set(all).size !== all.length) bad('یک استاد نمی‌تواند در بیش از یک جایگاه (راهنما/مشاور) انتخاب شود.');
+  if (all.includes(t.studentId ?? '')) bad('دانشجو نمی‌تواند استاد خود باشد.');
+  const ids = [...coSupervisorIds, ...advisorIds];
+  if (!ids.length) return;
+  const { records: profs } = await zite.profiles.findAll({ filters: { id: { in: ids } }, limit: 50 });
+  for (const id of ids) {
+    const prof = profs.find((x) => x.id === id);
+    if (!prof || prof.disabled || !prof.roles?.includes('professor')) bad('استاد انتخاب‌شده در سامانه معتبر نیست.');
+    if (first(prof.department) !== first(t.department)) bad(`«${prof.fullName ?? ''}» عضو گروه آموزشی این پرونده نیست.`);
+  }
+}
+
+/** Replaces the extra-supervisor/advisor rows of a thesis. Removed members are deactivated (never deleted) so history is preserved; every change is audited. */
+export async function applyCommittee(t: ThesesRecordType, coSupervisorIds: string[], advisorIds: string[], actor: Profile, actorRole: string) {
+  const { records } = await zite.thesisCommittee.findAll({ filters: { thesisId: t.id, isActive: true }, limit: 50 });
+  const want: { id: string; role: CommitteeRole; pos: number }[] = [
+    ...coSupervisorIds.map((id, i) => ({ id, role: 'supervisor' as const, pos: i + 2 })),
+    ...advisorIds.map((id, i) => ({ id, role: 'advisor' as const, pos: i + 1 })),
+  ];
+  const now = new Date().toISOString();
+  const names = await profileNames([...want.map((w) => w.id), ...records.map((r) => r.professorId ?? '')]);
+  const label = (role: string, pos: number) => (role === 'supervisor' ? `استاد راهنمای ${pos === 2 ? 'دوم' : pos}` : `استاد مشاور ${pos === 1 ? 'اول' : pos === 2 ? 'دوم' : pos === 3 ? 'سوم' : pos}`);
+  const changes: string[] = [];
+  for (const r of records) {
+    const keep = want.find((w) => w.id === r.professorId && w.role === r.committeeRole && w.pos === r.position);
+    if (!keep) {
+      await zite.thesisCommittee.update({ id: r.id, record: { isActive: false, removedById: actor.id, removedAt: now } });
+      changes.push(`حذف ${label(r.committeeRole ?? '', r.position ?? 0)}: ${names[r.professorId ?? ''] ?? ''}`);
+    }
+  }
+  const toAdd = want.filter((w) => !records.some((r) => r.professorId === w.id && r.committeeRole === w.role && r.position === w.pos));
+  if (toAdd.length) {
+    await zite.thesisCommittee.bulkCreate({
+      records: toAdd.map((w) => ({
+        label: `${t.thesisCode ?? ''} — ${label(w.role, w.pos)}`, thesisId: t.id, professorId: w.id, committeeRole: w.role, position: w.pos,
+        isActive: true, assignedById: actor.id, assignedAt: now, removedById: null, removedAt: null, note: null,
+      })),
+    });
+    for (const w of toAdd) changes.push(`افزودن ${label(w.role, w.pos)}: ${names[w.id] ?? ''}`);
+  }
+  const advisorId = advisorIds[0] ?? null;
+  if ((t.advisorId ?? null) !== advisorId) await zite.theses.update({ id: t.id, record: { advisorId } });
+  if (changes.length) await audit({ action: 'تغییر ترکیب استادان راهنما/مشاور', actor: actor.id, role: actorRole, thesisId: t.id, comment: changes.join('؛ ') });
+  return changes;
+}
+
+// ---------- Next responsible actor (derived from real status + chain + org structure) ----------
+export async function groupManagersOf(t: ThesesRecordType) {
+  const dep = first(t.department);
+  if (!dep) return [] as Profile[];
+  const { records } = await zite.profiles.findAll({ filters: { department: dep }, limit: 500 });
+  return records.filter((r) => r.roles?.includes('group_manager') && !r.disabled);
+}
+async function roleHolders(role: Role) {
+  const { records } = await zite.profiles.findAll({ limit: 2000 });
+  return records.filter((r) => !r.disabled && r.roles?.includes(role));
+}
+const STEP_ROLE_FA: Record<string, string> = { supervisor: 'استاد راهنما', group_manager: 'مدیر گروه', graduate_office: 'تحصیلات تکمیلی', finance: 'امور مالی' };
+export type NextActor = { roleLabel: string; people: string[]; expected: string; where: string; personIds: string[] };
+export async function nextActor(t: ThesesRecordType): Promise<NextActor | null> {
+  const s = t.status ?? '';
+  if (t.isLocked || CLOSED.includes(s)) return null;
+  const student = { roleLabel: 'دانشجو', ids: [t.studentId ?? ''] };
+  const sup = { roleLabel: 'استاد راهنما', ids: [t.supervisorId ?? ''] };
+  const gm = async () => ({ roleLabel: 'مدیر گروه', ids: (await groupManagersOf(t)).map((g) => g.id) });
+  const role = async (r: Role, label: string) => ({ roleLabel: label, ids: (await roleHolders(r)).map((g) => g.id) });
+  const step = async (st?: string | null) => (st === 'supervisor' ? sup : st === 'group_manager' ? gm() : st === 'graduate_office' ? role('graduate_office', STEP_ROLE_FA.graduate_office) : st === 'finance' ? role('finance', STEP_ROLE_FA.finance) : null);
+  let who: { roleLabel: string; ids: string[] } | null = null;
+  let expected = '';
+  let where = 'صفحهٔ جزئیات پرونده ← بخش «اقدام‌ها»';
+  switch (s) {
+    case 'DRAFT': case 'SUPERVISOR_REJECTED': who = student; expected = 'تکمیل موضوع و ارسال درخواست به استاد راهنما'; where = 'داشبورد دانشجو ← ثبت موضوع و انتخاب استاد'; break;
+    case 'WAITING_SUPERVISOR': {
+      const r = await zite.supervisorRequests.findOne({ filters: { thesis: t.id, requestStatus: 'pending' } });
+      who = { roleLabel: 'استاد راهنمای درخواست‌شده', ids: [r?.professorId ?? ''] }; expected = 'پذیرش یا رد درخواست راهنمایی'; break;
+    }
+    case 'GROUP_ASSIGNMENT': who = await gm(); expected = 'تخصیص استاد راهنما'; break;
+    case 'GROUP_REVIEW': who = await gm(); expected = 'تأیید موضوع، برگشت برای اصلاح یا رد'; break;
+    case 'TOPIC_REVISION': who = student; expected = 'اصلاح و ارسال مجدد موضوع'; where = 'داشبورد دانشجو ← اصلاح موضوع'; break;
+    case 'LITERATURE_REVIEW': who = student; expected = 'بارگذاری و ارسال پیشینهٔ تحقیق'; where = 'داشبورد دانشجو ← پیشینهٔ تحقیق'; break;
+    case 'LITERATURE_REVISION': who = student; expected = 'اصلاح پیشینه طبق علت برگشت و ارسال مجدد'; where = 'داشبورد دانشجو ← پیشینهٔ تحقیق'; break;
+    case 'LITERATURE_SUPERVISOR_REVIEW': who = sup; expected = 'بررسی پیشینه (مرحلهٔ ۱ از ۲): تأیید یا برگشت با ذکر علت'; break;
+    case 'LITERATURE_GROUP_REVIEW': who = await gm(); expected = 'بررسی پیشینه (مرحلهٔ ۲ از ۲): تأیید نهایی یا برگشت با ذکر علت'; break;
+    case 'PROPOSAL_DRAFT': case 'PROPOSAL_REVISION': who = student; expected = 'تکمیل فرم مرحله‌ای پروپوزال، بارگذاری فایل و ارسال برای بررسی'; where = 'داشبورد دانشجو ← فرم پروپوزال'; break;
+    case 'PROPOSAL_REVIEW': case 'EXTENSION_REQUESTED': who = await step(t.proposalStep); expected = s === 'PROPOSAL_REVIEW' ? `بررسی پروپوزال در مرحلهٔ «${STEP_ROLE_FA[t.proposalStep ?? ''] ?? ''}»` : `بررسی تمدید در مرحلهٔ «${STEP_ROLE_FA[t.proposalStep ?? ''] ?? ''}»`; break;
+    case 'IRANDOC_PENDING': who = student; expected = 'ثبت کد رهگیری و رسید ایرانداک'; where = 'داشبورد دانشجو ← ایرانداک'; break;
+    case 'IRANDOC_REVIEW': case 'SPECIAL_COMMISSION': case 'PLAGIARISM_CHECK': case 'DEFENSE_SCHEDULING': case 'DEFENSE_SCHEDULED': case 'THESIS_COMPLETED': case 'GRADUATION_PROCESS':
+      who = await role('graduate_office', 'تحصیلات تکمیلی');
+      expected = { IRANDOC_REVIEW: 'بررسی ایرانداک و تصویب نهایی', SPECIAL_COMMISSION: 'ثبت نتیجهٔ کمیسیون موارد خاص', PLAGIARISM_CHECK: 'ثبت نتیجهٔ همانندجویی', DEFENSE_SCHEDULING: 'تعیین زمان و محل دفاع', DEFENSE_SCHEDULED: 'ثبت نتیجهٔ دفاع', THESIS_COMPLETED: 'آغاز فرآیند فارغ‌التحصیلی', GRADUATION_PROCESS: 'تأیید مدارک چک‌لیست و فارغ‌التحصیلی' }[s] ?? ''; break;
+    case 'THESIS_ACTIVE': case 'FINAL_REVISION': who = student; expected = s === 'FINAL_REVISION' ? 'اصلاح و ارسال مجدد نسخهٔ نهایی' : 'ارسال نسخهٔ نهایی پایان‌نامه'; where = 'داشبورد دانشجو ← نسخهٔ نهایی'; break;
+    case 'EXTENSION_REQUIRED': who = student; expected = 'ثبت درخواست تمدید'; where = 'داشبورد دانشجو ← تمدید'; break;
+    case 'FINAL_SUPERVISOR_REVIEW': case 'DEFENDED': who = sup; expected = s === 'DEFENDED' ? 'تأیید تکمیل پایان‌نامه پس از اصلاحات دفاع' : 'بررسی نسخهٔ نهایی'; break;
+    case 'REVIEWER_ASSIGNMENT': who = await gm(); expected = 'تعیین داوران'; break;
+    case 'REVIEWING': {
+      const { records } = await zite.reviews.findAll({ filters: { thesis: t.id, verdict: 'pending' }, limit: 50 });
+      who = { roleLabel: 'داوران', ids: records.map((r) => r.reviewerId ?? '') }; expected = 'ثبت نظر داوری'; where = 'کارتابل داوری'; break;
+    }
+  }
+  if (!who) return null;
+  const ids = who.ids.filter(Boolean);
+  const names = await profileNames(ids);
+  return { roleLabel: who.roleLabel, people: ids.map((i) => names[i]).filter(Boolean), personIds: ids, expected, where };
 }

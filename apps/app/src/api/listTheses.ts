@@ -55,7 +55,7 @@ export default createEndpoint({
     if (input.inboxOnly) {
       const inbox: Record<string, string> = {
         professor: `(t."status" IN ('WAITING_SUPERVISOR','LITERATURE_SUPERVISOR_REVIEW','FINAL_SUPERVISOR_REVIEW') OR (${step('supervisor')} AND t."supervisorId" = $1))`,
-        group_manager: `(t."status" IN ('GROUP_ASSIGNMENT','GROUP_REVIEW','REVIEWER_ASSIGNMENT') OR ${step('group_manager')})`,
+        group_manager: `(t."status" IN ('GROUP_ASSIGNMENT','GROUP_REVIEW','LITERATURE_GROUP_REVIEW','REVIEWER_ASSIGNMENT') OR ${step('group_manager')})`,
         graduate_office: `(t."status" IN ('IRANDOC_REVIEW','SPECIAL_COMMISSION','PLAGIARISM_CHECK','DEFENSE_SCHEDULING','DEFENSE_SCHEDULED') OR ${step('graduate_office')})`,
         finance: step('finance'),
         admin: 'TRUE',

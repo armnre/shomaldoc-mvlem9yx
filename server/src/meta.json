@@ -160,6 +160,15 @@
    "proposalApprovedAt": {
     "kind": "datetime"
    },
+   "approvalDateSetById": {
+    "kind": "text"
+   },
+   "approvalDateSetAt": {
+    "kind": "datetime"
+   },
+   "proposalDraft": {
+    "kind": "text"
+   },
    "supervisorRequests": {
     "kind": "link",
     "table": "SupervisorRequestsTheses",
@@ -637,6 +646,9 @@
    "isActive": {
     "kind": "boolean"
    },
+   "faculty": {
+    "kind": "text"
+   },
    "profiles": {
     "kind": "link",
     "table": "ProfilesPrograms",
@@ -915,6 +927,47 @@
     "kind": "text"
    },
    "error": {
+    "kind": "text"
+   },
+   "created": {
+    "kind": "created"
+   }
+  }
+ },
+ "ThesisCommittee": {
+  "accessor": "thesisCommittee",
+  "fields": {
+   "label": {
+    "kind": "text"
+   },
+   "thesisId": {
+    "kind": "text"
+   },
+   "professorId": {
+    "kind": "text"
+   },
+   "committeeRole": {
+    "kind": "text"
+   },
+   "position": {
+    "kind": "number"
+   },
+   "isActive": {
+    "kind": "boolean"
+   },
+   "assignedById": {
+    "kind": "text"
+   },
+   "assignedAt": {
+    "kind": "datetime"
+   },
+   "removedById": {
+    "kind": "text"
+   },
+   "removedAt": {
+    "kind": "datetime"
+   },
+   "note": {
     "kind": "text"
    },
    "created": {

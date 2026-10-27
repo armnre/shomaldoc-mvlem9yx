@@ -5,7 +5,7 @@ import { audit, bad, getSettings, requireAuth, SETTING_DEFAULTS, STATUS_FA, STAT
 
 export default createEndpoint({
   description: 'Admin: reads and optionally updates configurable system settings and approval chains',
-  inputSchema: z.object({ token: z.string(), updates: z.record(z.string()).optional() }),
+  inputSchema: z.object({ token: z.string(), updates: z.record(z.string(), z.string()).optional() }),
   outputSchema: z.object({
     settings: z.array(z.object({ key: z.string(), value: z.string(), description: z.string(), kind: z.string() })),
     statuses: z.array(z.object({ key: z.string(), label: z.string() })),
@@ -18,6 +18,8 @@ export default createEndpoint({
         const def = SETTING_DEFAULTS[key];
         if (!def) bad(`کلید نامعتبر: ${key}`);
         if (def.kind === 'int' && (!/^\d+$/.test(value) || Number(value) < 1 || Number(value) > 100)) bad(`مقدار «${def.description}» باید عدد ۱ تا ۱۰۰ باشد.`);
+        if (def.kind === 'count' && (!/^\d+$/.test(value) || Number(value) < (def.min ?? 0) || Number(value) > (def.max ?? 10)))
+          bad(`مقدار «${def.description}» باید عدد صحیح ${def.min ?? 0} تا ${def.max ?? 10} باشد.`);
         if (def.kind === 'chain') {
           const parts = value.split(',').map((x) => x.trim());
           if (!parts.length || parts.some((x) => !STEPS.includes(x as never)) || new Set(parts).size !== parts.length) bad(`«${def.description}» نامعتبر است.`);

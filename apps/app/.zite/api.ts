@@ -2,6 +2,10 @@
 
 import { createCaller } from 'zitejs/caller';
 
+import type { default as _ListMastersProgramsEp } from '../src/api/listMastersPrograms';
+import type { default as _SetProposalApprovalDateEp } from '../src/api/setProposalApprovalDate';
+import type { default as _SetThesisProgramEp } from '../src/api/setThesisProgram';
+import type { default as _SaveProposalDraftEp } from '../src/api/saveProposalDraft';
 import type { default as _AcademicTermsEp } from '../src/api/academicTerms';
 import type { default as _AdminAuditLogEp } from '../src/api/adminAuditLog';
 import type { default as _AdminListUsersEp } from '../src/api/adminListUsers';
@@ -242,6 +246,22 @@ type _ThesisDetailCfg = typeof _ThesisDetailEp;
 export type ThesisDetailInputType = NonNullable<_ThesisDetailCfg['inputSchema']> extends { _input: infer I } ? I : Parameters<_ThesisDetailCfg['execute']>[0]['input'];
 export type ThesisDetailOutputType = Awaited<ReturnType<_ThesisDetailCfg['execute']>>;
 export const thesisDetail = createCaller<ThesisDetailInputType, ThesisDetailOutputType>('thesisDetail');
+type _SetThesisProgramCfg = typeof _SetThesisProgramEp;
+export type SetThesisProgramInputType = NonNullable<_SetThesisProgramCfg['inputSchema']> extends { _input: infer I } ? I : Parameters<_SetThesisProgramCfg['execute']>[0]['input'];
+export type SetThesisProgramOutputType = Awaited<ReturnType<_SetThesisProgramCfg['execute']>>;
+export const setThesisProgram = createCaller<SetThesisProgramInputType, SetThesisProgramOutputType>('setThesisProgram');
+type _SaveProposalDraftCfg = typeof _SaveProposalDraftEp;
+export type SaveProposalDraftInputType = NonNullable<_SaveProposalDraftCfg['inputSchema']> extends { _input: infer I } ? I : Parameters<_SaveProposalDraftCfg['execute']>[0]['input'];
+export type SaveProposalDraftOutputType = Awaited<ReturnType<_SaveProposalDraftCfg['execute']>>;
+export const saveProposalDraft = createCaller<SaveProposalDraftInputType, SaveProposalDraftOutputType>('saveProposalDraft');
+type _SetProposalApprovalDateCfg = typeof _SetProposalApprovalDateEp;
+export type SetProposalApprovalDateInputType = NonNullable<_SetProposalApprovalDateCfg['inputSchema']> extends { _input: infer I } ? I : Parameters<_SetProposalApprovalDateCfg['execute']>[0]['input'];
+export type SetProposalApprovalDateOutputType = Awaited<ReturnType<_SetProposalApprovalDateCfg['execute']>>;
+export const setProposalApprovalDate = createCaller<SetProposalApprovalDateInputType, SetProposalApprovalDateOutputType>('setProposalApprovalDate');
+type _ListMastersProgramsCfg = typeof _ListMastersProgramsEp;
+export type ListMastersProgramsInputType = NonNullable<_ListMastersProgramsCfg['inputSchema']> extends { _input: infer I } ? I : Parameters<_ListMastersProgramsCfg['execute']>[0]['input'];
+export type ListMastersProgramsOutputType = Awaited<ReturnType<_ListMastersProgramsCfg['execute']>>;
+export const listMastersPrograms = createCaller<ListMastersProgramsInputType, ListMastersProgramsOutputType>('listMastersPrograms');
 
 
 export const api = {
@@ -285,4 +305,8 @@ export const api = {
   submitReview,
   thesisAction,
   thesisDetail,
+  listMastersPrograms,
+  setProposalApprovalDate,
+  setThesisProgram,
+  saveProposalDraft,
 };

@@ -31,8 +31,16 @@ chown -R shomaldoc: "$APP" "$DATA" /var/backups/shomaldoc
 
 log "دریافت کد از گیت‌هاب ($BRANCH)"
 if [ -d "$APP/.git" ]; then
-  sudo -u shomaldoc git -C "$APP" fetch --depth 1 origin "$BRANCH"
-  sudo -u shomaldoc git -C "$APP" reset --hard "origin/$BRANCH"
+  # Never discard local server changes: stop if the tree is dirty, and only fast-forward.
+  if [ -n "$(sudo -u shomaldoc git -C "$APP" status --porcelain --untracked-files=no)" ]; then
+    echo "توقف: تغییرات محلی در $APP وجود دارد (git status). ابتدا آن‌ها را بررسی و در صورت نیاز git stash کنید." >&2
+    exit 1
+  fi
+  sudo -u shomaldoc git -C "$APP" fetch origin "$BRANCH"
+  if ! sudo -u shomaldoc git -C "$APP" merge --ff-only "origin/$BRANCH"; then
+    echo "توقف: شاخهٔ محلی با origin/$BRANCH واگرا شده است؛ ادغام دستی لازم است (هیچ تغییری حذف نشد)." >&2
+    exit 1
+  fi
 else
   sudo -u shomaldoc git clone --depth 1 -b "$BRANCH" "$REPO" "$APP"
 fi

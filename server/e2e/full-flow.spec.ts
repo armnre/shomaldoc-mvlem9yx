@@ -63,10 +63,7 @@ test('topic registration → graduation', async ({ page, browser }) => {
   // 2) Topic form (UI)
   await page.locator('#tf').fill('تحلیل داده‌های آموزشی دانشگاه شمال');
   await page.locator('#te').fill('Educational data analytics at Shomal University');
-  await page.locator('#kw').fill('داده‌کاوی، آموزش');
-  await page.locator('#ps').fill('شرح مسئلهٔ پژوهش با جزئیات کافی برای ارزیابی گروه آموزشی.');
-  await page.locator('#ob').fill('اهداف پژوهش با جزئیات کافی برای ارزیابی.');
-  await page.getByRole('button', { name: 'ذخیره پیش‌نویس' }).click();
+  await page.getByRole('button', { name: 'ذخیرهٔ موضوع' }).click();
 
   // 3) Supervisor + PDF upload through the authenticated upload route (UI)
   await page.getByRole('radio', { name: new RegExp(`کاربر ${U('sup')}`) }).click();
@@ -92,8 +89,13 @@ test('topic registration → graduation', async ({ page, browser }) => {
       case 'WAITING_SUPERVISOR': await uiAct(browser, U('sup'), id, 'پذیرش راهنمایی'); break;
       case 'GROUP_REVIEW': await uiAct(browser, U('gm'), id, 'تأیید موضوع'); break;
       case 'LITERATURE_REVIEW': await ok('submitDocument', { token: stu, kind: 'literature', content: 'پیشینهٔ تحقیق '.repeat(20), files }); break;
-      case 'LITERATURE_SUPERVISOR_REVIEW': await uiAct(browser, U('sup'), id, 'تأیید پیشینه'); break;
-      case 'PROPOSAL_DRAFT': await ok('submitDocument', { token: stu, kind: 'proposal', content: 'متن پروپوزال '.repeat(20), files, formAnswers: {} }); break;
+      case 'LITERATURE_SUPERVISOR_REVIEW': await uiAct(browser, U('sup'), id, 'تأیید پیشینه (استاد راهنما) و ارجاع به مدیر گروه'); break;
+      case 'LITERATURE_GROUP_REVIEW': await uiAct(browser, U('gm'), id, 'تأیید نهایی پیشینه (مدیر گروه)'); break;
+      case 'PROPOSAL_DRAFT': {
+        const pr = (await sql(`INSERT INTO "Programs"(name, degree, faculty, "isActive") VALUES ('مهندسی کامپیوتر','کارشناسی ارشد','دانشکده فنی',true) RETURNING id::text, name, faculty`)).rows[0];
+        await ok('setThesisProgram', { token: stu, thesisId: id, programId: pr.id, faculty: pr.faculty, major: pr.name });
+      }
+        await ok('submitDocument', { token: stu, kind: 'proposal', content: 'متن پروپوزال '.repeat(20), files, formAnswers: {} }); break;
       case 'PROPOSAL_REVIEW':
         for (const tk of [sup, gm, go]) {
           const a = (await ok<{ allowedActions: string[] }>('thesisDetail', { token: tk, thesisId: id })).allowedActions;

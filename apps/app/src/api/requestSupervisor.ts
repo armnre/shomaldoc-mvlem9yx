@@ -16,7 +16,7 @@ export default createEndpoint({
     const t = await findStudentThesis(p.id);
     if (!t) bad('ابتدا پیش‌نویس موضوع را ذخیره کنید.');
     if (!['DRAFT', 'SUPERVISOR_REJECTED'].includes(t.status ?? '')) forbidden('در وضعیت فعلی امکان درخواست استاد راهنما نیست.');
-    if (!t.titleFa || !t.problemStatement || !t.objectives) bad('عنوان، شرح مسئله و اهداف الزامی است.');
+    if (!t.titleFa) bad('ثبت موضوع پایان‌نامه الزامی است.');
     const prof = await zite.profiles.findOne({ id: input.professorId });
     if (!prof || !prof.roles?.includes('professor') || first(prof.department) !== first(t.department)) bad('استاد انتخاب‌شده در گروه شما نیست.');
     const prior = await zite.supervisorRequests.findOne({ filters: { thesis: t.id, professorId: prof.id } });
@@ -30,7 +30,7 @@ export default createEndpoint({
     });
     await newVersion({
       thesisId: t.id, kind: 'topic', userId: p.id, files: input.files,
-      content: `عنوان: ${t.titleFa}\nعنوان انگلیسی: ${t.titleEn ?? ''}\nکلیدواژه‌ها: ${t.keywords ?? ''}\n\nشرح مسئله:\n${t.problemStatement}\n\nاهداف:\n${t.objectives}`,
+      content: [`عنوان: ${t.titleFa}`, t.titleEn ? `عنوان انگلیسی: ${t.titleEn}` : ''].filter(Boolean).join('\n'),
     });
     await zite.theses.update({ id: t.id, record: { status: 'WAITING_SUPERVISOR' } });
     await audit({ action: 'درخواست استاد راهنما', actor: p.id, role: 'student', thesisId: t.id, from: t.status, to: 'WAITING_SUPERVISOR', comment: prof.fullName ?? '' });

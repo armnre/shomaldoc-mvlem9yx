@@ -33,4 +33,22 @@ g.__shomalWithProfileLock = async <T>(profileId: string, fn: () => Promise<T>): 
   }
 };
 
+/** Workflow race guard: holds a transaction-scoped advisory lock keyed on the thesis for the duration of fn (duplicate/concurrent transitions are serialised; the second sees the new status and is rejected). */
+g.__shomalWithThesisLock = async <T>(thesisId: string, fn: () => Promise<T>): Promise<T> => {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    // Advisory (not row) lock: the endpoint updates the Theses row through other pool connections, which a FOR UPDATE here would block.
+    await client.query("SELECT pg_advisory_xact_lock(hashtext('thesis:' || $1))", [thesisId]);
+    const out = await fn();
+    await client.query('COMMIT');
+    return out;
+  } catch (e) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw e;
+  } finally {
+    client.release();
+  }
+};
+
 export const INTERNAL_KEY = g.__shomalInternalKey as string;

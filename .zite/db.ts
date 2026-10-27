@@ -207,6 +207,12 @@ export type ThesesRecordType = {
   topicApprovedAt?: string;
   /** "Proposal Approved At". Date+time field (ISO 8601 timestamp), null when unset, date: "local" format, time: 12h */
   proposalApprovedAt?: string;
+  /** "Approval Date Set By". Profile id of who manually recorded the official proposal approval date */
+  approvalDateSetById?: string;
+  /** "Approval Date Set At". Date+time field (ISO 8601 timestamp), system time the official date was recorded */
+  approvalDateSetAt?: string;
+  /** JSON draft of the multi-step proposal form (answers, committee, files) — server-side autosave. */
+  proposalDraft?: string;
   /** Links to supervisorRequests ("Supervisor Requests"). "Supervisor Requests" */
   supervisorRequests?: string | string[];
   /** Links to documentVersions ("Document Versions"). "Document Versions" */
@@ -270,6 +276,9 @@ export type ThesesRecordInput = {
   supervisorRejections: string | number | null;
   topicApprovedAt: string | Date | null;
   proposalApprovedAt: string | Date | null;
+  approvalDateSetById?: string | null;
+  approvalDateSetAt?: string | Date | null;
+  proposalDraft?: string | null;
   supervisorRequests: string | string[] | null;
   documentVersions: string | string[] | null;
   auditLogs: string | string[] | null;
@@ -603,6 +612,8 @@ export type ProgramsRecordType = {
   /** Links to departments ("Departments"). "Department" */
   department?: string | string[];
   isActive?: boolean;
+  /** "Faculty". Faculty name from the official programs list */
+  faculty?: string;
   /** Links to profiles ("Profiles"). "Profiles" */
   profiles?: string | string[];
   /** Links to theses ("Theses"). "Theses" */
@@ -616,6 +627,7 @@ export type ProgramsRecordInput = {
   degree: "کارشناسی ارشد" | "دکتری" | string | null;
   department: string | string[] | null;
   isActive: string | boolean | null;
+  faculty?: string | null;
   profiles: string | string[] | null;
   theses: string | string[] | null;
 };
@@ -860,6 +872,42 @@ export type NotificationLogsRecordInput = {
   error: string | null;
 };
 
+/** A record in the "Thesis Committee" table, as it is read back. */
+export type ThesisCommitteeRecordType = {
+  id: string;
+  /** Primary field. "Label" */
+  label?: string;
+  thesisId?: string;
+  professorId?: string;
+  committeeRole?: "supervisor" | "advisor" | string;
+  position?: number;
+  isActive?: boolean;
+  assignedById?: string;
+  /** "Assigned At". Date+time field (ISO 8601 timestamp), null when unset, date: "local" format, time: 12h */
+  assignedAt?: string;
+  removedById?: string;
+  /** "Removed At". Date+time field (ISO 8601 timestamp), null when unset, date: "local" format, time: 12h */
+  removedAt?: string;
+  note?: string;
+  /** Read-only. "Created". Auto-set when record was created (ISO 8601) */
+  created?: string;
+};
+
+/** What you may write when creating or updating a record in the "Thesis Committee" table. */
+export type ThesisCommitteeRecordInput = {
+  label: string | null;
+  thesisId: string | null;
+  professorId: string | null;
+  committeeRole: "supervisor" | "advisor" | string | null;
+  position: number | null;
+  isActive: boolean | null;
+  assignedById: string | null;
+  assignedAt: string | Date | null;
+  removedById: string | null;
+  removedAt: string | Date | null;
+  note: string | null;
+};
+
 export interface ZiteAuthUser {
   id: string;
   name: string;
@@ -894,6 +942,7 @@ export const zite = {
   reminderLogs: createTableClient<ReminderLogsRecordType, ReminderLogsRecordInput>('ReminderLogs'), // "Reminder Logs"
   notificationTemplates: createTableClient<NotificationTemplatesRecordType, NotificationTemplatesRecordInput>('NotificationTemplates'), // "Notification Templates"
   notificationLogs: createTableClient<NotificationLogsRecordType, NotificationLogsRecordInput>('NotificationLogs'), // "Notification Logs"
+  thesisCommittee: createTableClient<ThesisCommitteeRecordType, ThesisCommitteeRecordInput>('ThesisCommittee'), // "Thesis Committee"
   sql: createSqlClient(),
   auth: createAuthClient<ZiteAuthUser>(),
 };
