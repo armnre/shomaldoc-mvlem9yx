@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useDebounce } from 'use-debounce';
 import { toast } from 'sonner';
-import { Lock, Plus } from 'lucide-react';
+import { FileSpreadsheet, Lock, Plus } from 'lucide-react';
 import { adminListUsers, listDepartments, type AdminListUsersOutputType, type ListDepartmentsOutputType } from 'zitejs/api';
 import { Input } from '@project/components/ui/input';
 import { Badge } from '@project/components/ui/badge';
@@ -11,6 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useSession } from '../../lib/session';
 import { errMsg, fa, ROLE_LABELS } from '../../lib/format';
 import UserEditDialog from './UserEditDialog';
+import ImportUsersDialog from './ImportUsersDialog';
 
 export type AdminUser = AdminListUsersOutputType['users'][number];
 
@@ -21,6 +22,7 @@ export default function AdminUsers() {
   const [users, setUsers] = useState<AdminUser[] | null>(null);
   const [deps, setDeps] = useState<ListDepartmentsOutputType['departments']>([]);
   const [edit, setEdit] = useState<AdminUser | 'new' | null>(null);
+  const [importing, setImporting] = useState(false);
   const load = useCallback(() => {
     adminListUsers({ token, search: q }).then((r) => setUsers(r.users)).catch((e) => toast.error(errMsg(e)));
   }, [q, token]);
@@ -32,13 +34,35 @@ export default function AdminUsers() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold">کاربران و نقش‌ها</h1>
+          <h1 className="text-xl font-bold sm:text-2xl">کاربران و نقش‌ها</h1>
           <p className="text-sm text-muted-foreground">حساب‌ها با نام کاربری (شماره دانشجویی / کد پرسنلی) و رمز موقت صادر می‌شوند؛ کاربر در نخستین ورود رمز را تغییر می‌دهد.</p>
         </div>
-        <Button onClick={() => setEdit('new')}><Plus className="ml-1 h-4 w-4" />کاربر جدید</Button>
+        <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto">
+          <Button variant="outline" onClick={() => setImporting(true)}><FileSpreadsheet className="ml-1 h-4 w-4" />ورود از اکسل</Button>
+          <Button onClick={() => setEdit('new')}><Plus className="ml-1 h-4 w-4" />کاربر جدید</Button>
+        </div>
       </div>
-      <Input placeholder="جستجو بر اساس نام، نام کاربری یا شماره دانشجویی" value={search} onChange={(e) => setSearch(e.target.value)} className="max-w-md" />
-      <div className="overflow-x-auto rounded-xl border bg-card">
+      <Input placeholder="جستجو بر اساس نام، نام کاربری یا شماره دانشجویی" value={search} onChange={(e) => setSearch(e.target.value)} className="w-full sm:max-w-md" />
+      {users && <p className="text-xs text-muted-foreground">{fa(users.length)} کاربر</p>}
+      <div className="space-y-2 md:hidden">
+        {!users && <Skeleton className="h-24" />}
+        {users?.map((u) => (
+          <button key={u.profileId} onClick={() => setEdit(u)} className={`w-full rounded-xl border bg-card p-3 text-right ${u.disabled ? 'opacity-60' : ''}`}>
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0"><div className="truncate font-semibold">{u.fullName || '—'}</div><div dir="ltr" className="text-right text-xs text-muted-foreground">{u.username}</div></div>
+              <span className="shrink-0 text-xs text-muted-foreground">{depName(u.departmentId)}</span>
+            </div>
+            <div className="mt-2 flex flex-wrap gap-1">
+              {u.roles.map((r) => <Badge key={r} variant="secondary">{ROLE_LABELS[r]}</Badge>)}
+              {u.disabled && <Badge variant="destructive">غیرفعال</Badge>}
+              {u.locked && <Badge variant="destructive">قفل موقت</Badge>}
+              {u.mustChangePassword && !u.disabled && <Badge variant="outline">رمز موقت</Badge>}
+            </div>
+          </button>
+        ))}
+        {users?.length === 0 && <p className="py-10 text-center text-muted-foreground">کاربری یافت نشد.</p>}
+      </div>
+      <div className="hidden overflow-x-auto rounded-xl border bg-card md:block">
         <Table>
           <TableHeader>
             <TableRow>
@@ -72,6 +96,7 @@ export default function AdminUsers() {
         </Table>
         {users?.length === 0 && <p className="py-10 text-center text-muted-foreground">کاربری یافت نشد.</p>}
       </div>
+      {importing && <ImportUsersDialog onClose={() => setImporting(false)} onDone={load} />}
       {edit && <UserEditDialog user={edit === 'new' ? null : edit} departments={deps} onClose={() => setEdit(null)} onSaved={() => { setEdit(null); load(); }} />}
     </div>
   );

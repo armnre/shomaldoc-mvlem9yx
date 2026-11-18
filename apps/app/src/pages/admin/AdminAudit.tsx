@@ -24,9 +24,21 @@ export default function AdminAudit() {
   const st = (s: string) => STATUS[s]?.label ?? s;
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold">گزارش رویدادها (Audit Log)</h1>
-      <Input className="max-w-md" placeholder="جستجو: عملیات، کاربر، کد پرونده، توضیح" value={search} onChange={(e) => setSearch(e.target.value)} />
-      <div className="overflow-x-auto rounded-xl border bg-card">
+      <h1 className="text-xl font-bold sm:text-2xl">گزارش رویدادها (Audit Log)</h1>
+      <Input className="w-full sm:max-w-md" placeholder="جستجو: عملیات، کاربر، کد پرونده، توضیح" value={search} onChange={(e) => setSearch(e.target.value)} />
+      <div className="space-y-2 md:hidden">
+        {!d && <Skeleton className="h-24" />}
+        {d?.rows.map((r) => (
+          <div key={r.id} className="rounded-xl border bg-card p-3 text-sm">
+            <div className="flex justify-between gap-2"><b>{ACTION_LABELS[r.action] ?? r.action}</b><span className="shrink-0 text-xs text-muted-foreground">{jalali(r.at, true)}</span></div>
+            <div className="mt-1 text-xs text-muted-foreground">{r.actorName || '—'} · {ROLE_LABELS[r.role] ?? r.role}{r.thesisCode ? ` · ${r.thesisCode}` : ''}</div>
+            {(r.from || r.to) && <div className="mt-1 text-xs">{st(r.from) || '—'} ← {st(r.to) || '—'}</div>}
+            {r.comment && <div className="mt-1 break-words text-xs">{r.comment}</div>}
+          </div>
+        ))}
+        {d?.rows.length === 0 && <p className="py-10 text-center text-muted-foreground">رویدادی یافت نشد.</p>}
+      </div>
+      <div className="hidden overflow-x-auto rounded-xl border bg-card md:block">
         <Table>
           <TableHeader>
             <TableRow>

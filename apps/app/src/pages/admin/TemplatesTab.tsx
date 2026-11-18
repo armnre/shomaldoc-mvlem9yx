@@ -39,13 +39,13 @@ export default function TemplatesTab() {
         <CardHeader className="flex-row flex-wrap items-center justify-between gap-2 space-y-0">
           <CardTitle className="text-base">لاگ ارسال اعلان‌ها ({fa(d.logTotal)})</CardTitle>
           <Select value={channel} onValueChange={(v) => { setChannel(v as typeof channel); setPage(0); }}>
-            <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="w-full sm:w-40"><SelectValue /></SelectTrigger>
             <SelectContent><SelectItem value="all">همهٔ کانال‌ها</SelectItem>{Object.entries(CH).map(([k, l]) => <SelectItem key={k} value={k}>{l}</SelectItem>)}</SelectContent>
           </Select>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="overflow-x-auto">
-            <Table>
+            <Table className="min-w-[640px]">
               <TableHeader><TableRow><TableHead>زمان</TableHead><TableHead>کاربر</TableHead><TableHead>کانال</TableHead><TableHead>گیرنده</TableHead><TableHead>عنوان</TableHead><TableHead>نتیجه</TableHead></TableRow></TableHeader>
               <TableBody>
                 {d.logs.length === 0 && <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground">موردی ثبت نشده است.</TableCell></TableRow>}

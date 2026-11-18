@@ -41,7 +41,7 @@ function Faculties({ d, run }: { d: S; run: Run }) {
       <CardContent className="space-y-2">
         <div className="flex gap-2">
           <Input placeholder="نام دانشکده" value={name} onChange={(e) => setName(e.target.value)} />
-          <Input placeholder="کد" className="w-24" value={code} onChange={(e) => setCode(e.target.value)} />
+          <Input placeholder="کد" className="w-20 shrink-0" value={code} onChange={(e) => setCode(e.target.value)} />
           <Button disabled={name.trim().length < 2} onClick={() => run({ op: 'saveFaculty', name, code }).then(() => { setName(''); setCode(''); })}>افزودن</Button>
         </div>
         {d.faculties.length === 0 && <p className="text-sm text-muted-foreground">هنوز دانشکده‌ای تعریف نشده است.</p>}
@@ -56,7 +56,7 @@ function FacultyRow({ f, run }: { f: S['faculties'][number]; run: Run }) {
   return (
     <div className="flex gap-2">
       <Input value={name} onChange={(e) => setName(e.target.value)} />
-      <Input className="w-24" value={code} onChange={(e) => setCode(e.target.value)} />
+      <Input className="w-20 shrink-0" value={code} onChange={(e) => setCode(e.target.value)} />
       <Button variant="outline" disabled={name === f.name && code === f.code} onClick={() => run({ op: 'saveFaculty', id: f.id, name, code })}>ذخیره</Button>
       <Button variant="ghost" size="icon" aria-label="حذف" onClick={() => run({ op: 'deleteFaculty', id: f.id })}><Trash2 className="h-4 w-4" /></Button>
     </div>
@@ -75,10 +75,10 @@ function Departments({ d, run, reload }: { d: S; run: Run; reload: () => void })
       <CardContent className="space-y-2">
         <div className="flex gap-2"><Input placeholder="نام گروه جدید" value={name} onChange={(e) => setName(e.target.value)} /><Button disabled={name.trim().length < 2} onClick={add}>افزودن</Button></div>
         {d.departments.map((dep) => (
-          <div key={dep.id} className="flex items-center gap-2">
+          <div key={dep.id} className="flex flex-col gap-2 border-b pb-2 sm:flex-row sm:items-center sm:border-0 sm:pb-0">
             <span className="flex-1 text-sm">{dep.name}</span>
             <Select value={dep.facultyId || undefined} onValueChange={(v) => run({ op: 'linkDepartment', departmentId: dep.id, facultyId: v })}>
-              <SelectTrigger className="w-52"><SelectValue placeholder="انتخاب دانشکده" /></SelectTrigger>
+              <SelectTrigger className="w-full sm:w-52"><SelectValue placeholder="انتخاب دانشکده" /></SelectTrigger>
               <SelectContent>{d.faculties.map((f) => <SelectItem key={f.id} value={f.id}>{f.name}</SelectItem>)}</SelectContent>
             </Select>
           </div>
@@ -106,7 +106,7 @@ function ProgramRow({ p, d, run }: { p?: S['programs'][number]; d: S; run: Run }
   const valid = v.name.trim().length >= 2 && v.degree && v.departmentId;
   const save = () => run({ op: 'saveProgram', id: p?.id, ...v, degree: v.degree as 'کارشناسی ارشد' | 'دکتری' }).then(() => { if (!p) setV({ name: '', specialization: '', degree: '', departmentId: '', isActive: true }); });
   return (
-    <div className="grid gap-2 md:grid-cols-[1fr_1fr_150px_180px_auto_auto_auto] md:items-center">
+    <div className="grid gap-2 grid-cols-2 border-b pb-3 md:grid-cols-[1fr_1fr_150px_180px_auto_auto_auto] md:items-center md:border-0 md:pb-0">
       <Input placeholder="رشته" value={v.name} onChange={(e) => setV({ ...v, name: e.target.value })} />
       <Input placeholder="گرایش" value={v.specialization} onChange={(e) => setV({ ...v, specialization: e.target.value })} />
       <Select value={v.degree || undefined} onValueChange={(x) => setV({ ...v, degree: x })}>
