@@ -9,6 +9,7 @@ import type { default as _SaveProposalDraftEp } from '../src/api/saveProposalDra
 import type { default as _AcademicTermsEp } from '../src/api/academicTerms';
 import type { default as _AdminAuditLogEp } from '../src/api/adminAuditLog';
 import type { default as _AdminListUsersEp } from '../src/api/adminListUsers';
+import type { default as _AdminImportUsersEp } from '../src/api/adminImportUsers';
 import type { default as _AdminResetPasswordEp } from '../src/api/adminResetPassword';
 import type { default as _AdminSaveDepartmentEp } from '../src/api/adminSaveDepartment';
 import type { default as _AdminSettingsEp } from '../src/api/adminSettings';
@@ -81,6 +82,11 @@ type _AdminStructureCfg = typeof _AdminStructureEp;
 export type AdminStructureInputType = NonNullable<_AdminStructureCfg['inputSchema']> extends { _input: infer I } ? I : Parameters<_AdminStructureCfg['execute']>[0]['input'];
 export type AdminStructureOutputType = Awaited<ReturnType<_AdminStructureCfg['execute']>>;
 export const adminStructure = createCaller<AdminStructureInputType, AdminStructureOutputType>('adminStructure');
+
+type _AdminImportUsersCfg = typeof _AdminImportUsersEp;
+export type AdminImportUsersInputType = NonNullable<_AdminImportUsersCfg['inputSchema']> extends { _input: infer I } ? I : Parameters<_AdminImportUsersCfg['execute']>[0]['input'];
+export type AdminImportUsersOutputType = Awaited<ReturnType<_AdminImportUsersCfg['execute']>>;
+export const adminImportUsers = createCaller<AdminImportUsersInputType, AdminImportUsersOutputType>('adminImportUsers');
 
 type _AdminUpdateUserCfg = typeof _AdminUpdateUserEp;
 export type AdminUpdateUserInputType = NonNullable<_AdminUpdateUserCfg['inputSchema']> extends { _input: infer I } ? I : Parameters<_AdminUpdateUserCfg['execute']>[0]['input'];
@@ -268,6 +274,7 @@ export const api = {
   academicTerms,
   adminAuditLog,
   adminListUsers,
+  adminImportUsers,
   adminResetPassword,
   adminSaveDepartment,
   adminSettings,
