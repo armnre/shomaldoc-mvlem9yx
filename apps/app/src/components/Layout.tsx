@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
   BarChart3, Building2, CalendarRange, ClipboardList, FileText, FolderOpen, Inbox, LayoutDashboard, LogOut,
-  Menu, Moon, ScrollText, Settings, SlidersHorizontal, Sun, UserRound, Users, Wallet, type LucideIcon,
+  BookOpen, Menu, Moon, ScrollText, Settings, SlidersHorizontal, Sun, UserRound, Users, Wallet, type LucideIcon,
 } from 'lucide-react';
 import { Button } from '@project/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@project/components/ui/sheet';
@@ -12,6 +12,8 @@ import Logo from './Logo';
 import NotificationBell from './NotificationBell';
 import { useSession } from '../lib/session';
 import { ROLE_LABELS } from '../lib/format';
+
+const GUIDE_ROLES = ['student', 'professor', 'group_manager', 'graduate_office', 'finance', 'reviewer', 'admin'];
 
 type Item = { to: string; label: string; icon: LucideIcon };
 const NAV: Record<string, Item[]> = {
@@ -67,6 +69,10 @@ function SidebarBody({ items, onPick }: { items: Item[]; onPick?: () => void }) 
         ) : <div className="mt-1 text-xs text-sidebar-primary">{ROLE_LABELS[role] ?? role}</div>}
       </div>
       <div className="flex-1 overflow-y-auto"><NavList items={items} onPick={onPick} /></div>
+      <a href={`/guides/${GUIDE_ROLES.includes(role) ? role : 'student'}.pdf`} target="_blank" rel="noreferrer" onClick={onPick}
+        className="flex items-center gap-3 rounded-lg border border-sidebar-border px-3 py-2.5 text-sm text-sidebar-foreground/80 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
+        <BookOpen className="h-4 w-4 shrink-0" />راهنمای استفاده (PDF)
+      </a>
 
     </div>
   );
