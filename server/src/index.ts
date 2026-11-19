@@ -125,5 +125,5 @@ if (process.argv[2] === 'run-job') {
 } else if (process.env.NODE_ENV !== 'test') {
   startJobs(endpoints);
   const HOST = process.env.HOST ?? '127.0.0.1';
-  app.listen(PORT, HOST, () => console.log(`ShomalDoc listening on ${HOST}:${PORT} (${endpoints.size} endpoints)`));
+  app.listen(PORT, HOST, () => console.log(`Kavoshyar listening on ${HOST}:${PORT} (${endpoints.size} endpoints)`));
 }

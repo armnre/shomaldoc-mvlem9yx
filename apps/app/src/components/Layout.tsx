@@ -53,7 +53,7 @@ function SidebarBody({ items, onPick }: { items: Item[]; onPick?: () => void }) 
       <NavLink to="/" onClick={onPick} className="flex items-center gap-3 border-b border-sidebar-border pb-4">
         <div className="rounded-xl bg-white p-1"><Logo /></div>
         <div className="leading-tight">
-          <div className="text-lg font-extrabold text-white">شمال‌داک</div>
+          <div className="text-lg font-extrabold text-white">کاوش‌یار</div>
           <div className="text-[11px] text-sidebar-foreground/70">سامانهٔ پایان‌نامه · دانشگاه شمال آمل</div>
         </div>
       </NavLink>

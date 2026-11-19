@@ -24,10 +24,12 @@ export default function AdminUsers() {
   const [edit, setEdit] = useState<AdminUser | 'new' | null>(null);
   const [importing, setImporting] = useState(false);
   const load = useCallback(() => {
-    adminListUsers({ token, search: q }).then((r) => setUsers(r.users)).catch((e) => toast.error(errMsg(e)));
+    // Departments are reloaded with users: an Excel import may have just created new ones.
+    Promise.all([adminListUsers({ token, search: q }), listDepartments({ token })])
+      .then(([u, d]) => { setUsers(u.users); setDeps(d.departments); })
+      .catch((e) => toast.error(errMsg(e)));
   }, [q, token]);
   useEffect(load, [load]);
-  useEffect(() => { listDepartments({ token }).then((r) => setDeps(r.departments)).catch(() => undefined); }, [token]);
   const depName = (id: string) => deps.find((d) => d.id === id)?.name ?? '—';
 
   return (
