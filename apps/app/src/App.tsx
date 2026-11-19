@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { me as fetchMe, logout, type MeOutputType } from 'zitejs/api';
 import { Toaster } from '@project/components/ui/sonner';
@@ -9,16 +9,16 @@ import Layout from './components/Layout';
 import LoginScreen from './pages/LoginScreen';
 import ForcePasswordChange from './pages/ForcePasswordChange';
 import Home from './pages/Home';
-import ThesisDetailPage from './pages/ThesisDetailPage';
-import ThesesPage from './pages/ThesesPage';
-import AdminUsers from './pages/admin/AdminUsers';
-import AdminDepartments from './pages/admin/AdminDepartments';
-import AdminSettings from './pages/admin/AdminSettings';
-import AdminAudit from './pages/admin/AdminAudit';
-import AdminTerms from './pages/admin/AdminTerms';
-import ProfilePage from './pages/ProfilePage';
-import ReportsPage from './pages/ReportsPage';
-import AdminConfig from './pages/admin/AdminConfig';
+const ThesisDetailPage = lazy(() => import('./pages/ThesisDetailPage'));
+const ThesesPage = lazy(() => import('./pages/ThesesPage'));
+const AdminUsers = lazy(() => import('./pages/admin/AdminUsers'));
+const AdminDepartments = lazy(() => import('./pages/admin/AdminDepartments'));
+const AdminSettings = lazy(() => import('./pages/admin/AdminSettings'));
+const AdminAudit = lazy(() => import('./pages/admin/AdminAudit'));
+const AdminTerms = lazy(() => import('./pages/admin/AdminTerms'));
+const ProfilePage = lazy(() => import('./pages/ProfilePage'));
+const ReportsPage = lazy(() => import('./pages/ReportsPage'));
+const AdminConfig = lazy(() => import('./pages/admin/AdminConfig'));
 import RoleGuard from './components/RoleGuard';
 
 const STAFF = ['professor', 'group_manager', 'graduate_office', 'finance', 'admin'];
@@ -77,6 +77,7 @@ export default function App() {
     <SessionContext.Provider value={value}>
       <BrowserRouter>
         <Layout>
+          <Suspense fallback={<PageSkeleton />}>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/theses" element={<RoleGuard roles={STAFF}><ThesesPage /></RoleGuard>} />
@@ -91,6 +92,7 @@ export default function App() {
             <Route path="/admin/audit" element={<RoleGuard roles={['admin']}><AdminAudit /></RoleGuard>} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
+          </Suspense>
         </Layout>
       </BrowserRouter>
       <Toaster position="top-center" dir="rtl" />
@@ -106,4 +108,8 @@ function FullSkeleton() {
       <Skeleton className="h-64 w-full" />
     </div>
   );
+}
+
+function PageSkeleton() {
+  return <div className="space-y-4"><Skeleton className="h-10 w-1/3" /><Skeleton className="h-64 w-full" /></div>;
 }
