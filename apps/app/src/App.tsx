@@ -31,7 +31,7 @@ export default function App() {
   useEffect(() => {
     document.documentElement.dir = 'rtl';
     document.documentElement.lang = 'fa';
-    document.title = 'شمال‌داک | سامانه مدیریت پایان‌نامه دانشگاه شمال';
+    document.title = 'کاوش‌یار | سامانه مدیریت پایان‌نامه دانشگاه شمال';
     let icon = document.querySelector<HTMLLinkElement>("link[rel='icon']");
     if (!icon) { icon = document.createElement('link'); icon.rel = 'icon'; document.head.appendChild(icon); }
     icon.type = 'image/png';

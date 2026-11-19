@@ -44,7 +44,7 @@ export function installDeliveryProviders() {
         try {
           await transport.sendMail({
             from: process.env.SMTP_FROM, to: m.profile.email, subject: m.title, text: asText(m),
-            html: `<div dir="rtl" style="font-family:Tahoma,sans-serif;line-height:1.9"><h3>${esc(m.title)}</h3><p>${esc(m.body).replace(/\n/g, '<br>')}</p>${process.env.PUBLIC_URL ? `<p><a href="${esc(process.env.PUBLIC_URL)}">ورود به شمال‌داک</a></p>` : ''}</div>`,
+            html: `<div dir="rtl" style="font-family:Tahoma,sans-serif;line-height:1.9"><h3>${esc(m.title)}</h3><p>${esc(m.body).replace(/\n/g, '<br>')}</p>${process.env.PUBLIC_URL ? `<p><a href="${esc(process.env.PUBLIC_URL)}">ورود به کاوش‌یار</a></p>` : ''}</div>`,
           });
           return { status: 'sent', recipient: m.profile.email };
         } catch (e) {

@@ -126,11 +126,11 @@ header { display: flex; align-items: center; gap: 12px; border-bottom: 2px solid
 header img { height: 52px; } h1 { font-size: 13pt; margin: 0; color: #1e3a6e; }
 table { width: 100%; border-collapse: collapse; } th, td { border: 1px solid #ccd; padding: 4px 5px; text-align: right; }
 th { background: #eef2f9; } tr:nth-child(even) td { background: #fafbfd; } footer { margin-top: 8px; font-size: 8pt; color: #555; }
-</style></head><body><header><img src="${LOGO_DATA_URI}"><div><h1>گزارش پرونده‌های پایان‌نامه — شمال‌داک</h1>
+</style></head><body><header><img src="${LOGO_DATA_URI}"><div><h1>گزارش پرونده‌های پایان‌نامه — کاوش‌یار</h1>
 <div>دانشگاه شمال · تعداد: ${out.length} · تاریخ گزارش: ${esc(fdate(new Date().toISOString()))}</div></div></header>
 <table><thead><tr><th>کد</th><th>عنوان</th><th>دانشجو</th><th>ش. دانشجویی</th><th>استاد راهنما</th><th>دانشکده</th><th>گروه</th><th>رشته / گرایش</th><th>وضعیت</th><th>ثبت</th><th>نمره</th><th>کد ایرانداک</th></tr></thead><tbody>
 ${out.map((r) => `<tr><td>${esc(r.code)}</td><td>${esc(r.title)}</td><td>${esc(r.student)}</td><td>${esc(r.studentNumber)}</td><td>${esc(r.supervisor)}</td><td>${esc(r.faculty)}</td><td>${esc(r.department)}</td><td>${esc([r.program, r.specialization].filter(Boolean).join(' / '))}</td><td>${esc(r.statusLabel)}</td><td>${esc(fdate(r.created))}</td><td>${r.defenseScore ?? '—'}</td><td>${esc(r.irandocCode)}</td></tr>`).join('')}
-</tbody></table><footer>© ۱۴۰۵ دانشگاه شمال، معاونت پژوهش و فناوری — سامانهٔ شمال‌داک</footer></body></html>`;
+</tbody></table><footer>© ۱۴۰۵ دانشگاه شمال، معاونت پژوهش و فناوری — سامانهٔ کاوش‌یار</footer></body></html>`;
     const pdf = await ZitePdf.renderHtml({ html, filename: `thesis-report-${Date.now()}.pdf` });
     return { pdfUrl: pdf.url, total: out.length };
   },

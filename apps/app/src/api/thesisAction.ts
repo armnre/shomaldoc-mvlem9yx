@@ -418,7 +418,7 @@ ${comment ? `<p><b>توضیحات هیئت داوران:</b> ${esc(comment)}</p>
 ${t.advisorId ? `<tr><td>استاد مشاور</td><td>${esc(names[t.advisorId])}</td><td>—</td><td></td></tr>` : ''}
 ${rv.map((r) => `<tr><td>${r.reviewerType === 'external' ? 'داور خارجی' : 'داور داخلی'}</td><td>${esc(names[r.reviewerId ?? ''])}</td><td>${r.score ?? '—'}</td><td></td></tr>`).join('')}
 <tr><td>نمایندهٔ تحصیلات تکمیلی</td><td>${esc(p.fullName)}</td><td>—</td><td></td></tr></table>
-<p style="font-size:9pt;color:#555">تاریخ صدور: ${esc(fd(now))} — سامانهٔ شمال‌داک</p></body></html>`;
+<p style="font-size:9pt;color:#555">تاریخ صدور: ${esc(fd(now))} — سامانهٔ کاوش‌یار</p></body></html>`;
           const pdf = await ZitePdf.renderHtml({ html, filename: `minutes-${t.thesisCode ?? t.id}.pdf` });
           upd.minutesPdf = [{ url: pdf.url, filename: `صورتجلسه-${t.thesisCode ?? ''}.pdf` }];
           to = 'DEFENDED';

@@ -56,7 +56,7 @@ export default function LoginScreen({ onSignedIn }: { onSignedIn: () => void }) 
         <div className="relative flex items-center gap-3">
           <Logo className="h-12 w-12" />
           <div>
-            <div className="text-xl font-bold text-white">شمال‌داک</div>
+            <div className="text-xl font-bold text-white">کاوش‌یار</div>
             <div className="text-sm opacity-75">دانشگاه شمال آمل</div>
           </div>
         </div>
