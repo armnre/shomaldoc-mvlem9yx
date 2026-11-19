@@ -2,14 +2,14 @@
 """Builds the per-role user guides (PDF) for Kavoshyar.
 
 Usage:  python3 docs/guides/build.py <screenshots-dir> <chrome-path>
-Screenshots come from `server/e2e/screens.ts`. Output: apps/app/public/guides/<role>.pdf
+Screenshots come from `server/e2e/screens.ts`. Output: docs/guides/pdf/<role>.pdf
 """
 import base64, html, io, os, subprocess, sys
 from PIL import Image
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 SHOTS, CHROME = sys.argv[1], sys.argv[2]
-OUT = os.path.join(ROOT, 'apps/app/public/guides')
+OUT = os.path.join(ROOT, 'docs/guides/pdf')
 FONT = os.path.join(ROOT, 'node_modules/@fontsource-variable/vazirmatn/files')
 LOGO = os.path.join(ROOT, 'apps/app/public/brand')
 os.makedirs(OUT, exist_ok=True)
