@@ -4,8 +4,7 @@ import { FileSpreadsheet, Upload } from 'lucide-react';
 import { adminImportUsers, type AdminImportUsersInputType, type AdminImportUsersOutputType } from 'zitejs/api';
 import { Button } from '@project/components/ui/button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@project/components/ui/dialog';
-import { Input } from '@project/components/ui/input';
-import { Label } from '@project/components/ui/label';
+import { Checkbox } from '@project/components/ui/checkbox';
 import { useSession } from '../../lib/session';
 import { errMsg, fa } from '../../lib/format';
 import { clean, readXlsx } from '../../lib/xlsx';
@@ -49,10 +48,10 @@ function toRows(table: string[][]): { kind: Kind; rows: Row[] } {
 export default function ImportUsersDialog({ onClose, onDone }: { onClose: () => void; onDone: () => void }) {
   const { token } = useSession();
   const [parsed, setParsed] = useState<{ kind: Kind; rows: Row[]; name: string } | null>(null);
-  const [pw, setPw] = useState('');
+  const [reset, setReset] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [result, setResult] = useState<AdminImportUsersOutputType | null>(null);
-  const pwOk = pw.length >= 8 && /[A-Za-z]/.test(pw) && /\d/.test(pw);
 
   const pick = async (file?: File) => {
     if (!file) return;
@@ -63,11 +62,19 @@ export default function ImportUsersDialog({ onClose, onDone }: { onClose: () => 
     if (!parsed) return;
     setBusy(true);
     try {
-      const r = await adminImportUsers({ token, kind: parsed.kind, tempPassword: pw, rows: parsed.rows });
+      // Send in small batches: password hashing is deliberately slow, so one huge request could time out.
+      const total: AdminImportUsersOutputType = { created: 0, updated: 0, skipped: 0, departmentsCreated: [], programsCreated: [], errors: [] };
+      for (let i = 0; i < parsed.rows.length; i += 15) {
+        setProgress(Math.round((i / parsed.rows.length) * 100));
+        const part = await adminImportUsers({ token, kind: parsed.kind, resetPasswords: reset, rows: parsed.rows.slice(i, i + 15) });
+        total.created += part.created; total.updated += part.updated; total.skipped += part.skipped;
+        total.departmentsCreated.push(...part.departmentsCreated); total.programsCreated.push(...part.programsCreated);
+        total.errors.push(...part.errors.map((e) => ({ ...e, row: e.row + i })));
+      }
+      const r = total;
       setResult(r);
       toast.success(`${fa(r.created)} کاربر جدید و ${fa(r.updated)} به‌روزرسانی`);
-      onDone();
-    } catch (e) { toast.error(errMsg(e)); } finally { setBusy(false); }
+    } catch (e) { toast.error(errMsg(e)); } finally { setBusy(false); onDone(); }
   };
 
   return (
@@ -75,7 +82,7 @@ export default function ImportUsersDialog({ onClose, onDone }: { onClose: () => 
       <DialogContent dir="rtl" className="max-h-[90vh] w-[calc(100vw-1.5rem)] overflow-y-auto sm:max-w-xl">
         <DialogHeader><DialogTitle>ورود گروهی از اکسل</DialogTitle></DialogHeader>
         <div className="space-y-4 text-sm">
-          <p className="text-muted-foreground">فایل ‎.xlsx دانشجویان (با ستون «شماره دانشجویی») یا استادان (با ستون «ظرفیت راهنمایی») را انتخاب کنید. نوع فایل خودکار تشخیص داده می‌شود. کاربرانِ موجود با همان نام کاربری به‌روزرسانی می‌شوند و رمزشان تغییر نمی‌کند.</p>
+          <p className="text-muted-foreground">فایل ‎.xlsx دانشجویان (با ستون «شماره دانشجویی») یا استادان (با ستون «ظرفیت راهنمایی») را انتخاب کنید. نوع فایل خودکار تشخیص داده می‌شود. گروه‌های آموزشی و رشته‌هایی که در سامانه نیستند خودکار ساخته می‌شوند.</p>
           <label className="flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 border-dashed p-6 text-center hover:bg-muted/50">
             <FileSpreadsheet className="h-8 w-8 text-primary" />
             <span>{parsed ? parsed.name : 'انتخاب فایل اکسل'}</span>
@@ -89,11 +96,17 @@ export default function ImportUsersDialog({ onClose, onDone }: { onClose: () => 
               </ul>
             </div>
           )}
-          <div className="space-y-1.5">
-            <Label htmlFor="pw">رمز موقت برای حساب‌های جدید</Label>
-            <Input id="pw" dir="ltr" value={pw} onChange={(e) => setPw(e.target.value)} placeholder="مثلاً Kavosh1405" />
-            <p className="text-xs text-muted-foreground">حداقل ۸ نویسه، شامل حرف لاتین و عدد. کاربر در نخستین ورود باید آن را تغییر دهد.</p>
+          <div className="rounded-lg border p-3 text-xs leading-6">
+            <b>رمز اولیه:</b> دانشجویان ← کد ملی · استادان ← همان نام کاربری. همه در نخستین ورود ملزم به تغییر رمز هستند.
           </div>
+          <label className="flex items-start gap-2 text-xs"><Checkbox checked={reset} onCheckedChange={(c) => setReset(!!c)} className="mt-0.5" />رمز کاربرانی که از قبل در سامانه هستند هم به رمز اولیه بازنشانی شود (پیش‌فرض: رمز فعلی‌شان حفظ می‌شود).</label>
+          {result && (
+            <div className="space-y-1 rounded-lg bg-muted p-3 text-xs">
+              <div>جدید: <b>{fa(result.created)}</b> · به‌روزرسانی: <b>{fa(result.updated)}</b> · تکراری در فایل: <b>{fa(result.skipped)}</b> · خطا: <b>{fa(result.errors.length)}</b></div>
+              {result.departmentsCreated.length > 0 && <div>گروه‌های ساخته‌شده: {result.departmentsCreated.join('، ')}</div>}
+              {result.programsCreated.length > 0 && <div>رشته‌های ساخته‌شده: {result.programsCreated.join('، ')}</div>}
+            </div>
+          )}
           {result && result.errors.length > 0 && (
             <div className="max-h-48 space-y-1 overflow-y-auto rounded-lg border border-destructive/40 p-3 text-xs">
               {result.errors.map((e, i) => <div key={i}>ردیف {fa(e.row)} ({e.username}): {e.message}</div>)}
@@ -102,7 +115,7 @@ export default function ImportUsersDialog({ onClose, onDone }: { onClose: () => 
         </div>
         <DialogFooter className="flex-col-reverse gap-2 sm:flex-row">
           <Button variant="outline" onClick={onClose}>بستن</Button>
-          <Button onClick={run} disabled={!parsed || !pwOk || busy}><Upload className="ml-1 h-4 w-4" />{busy ? 'در حال ورود…' : 'شروع ورود'}</Button>
+          <Button onClick={run} disabled={!parsed || busy}><Upload className="ml-1 h-4 w-4" />{busy ? `در حال ورود… ${fa(progress)}٪` : 'شروع ورود'}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
