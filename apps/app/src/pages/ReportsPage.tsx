@@ -67,8 +67,8 @@ export default function ReportsPage() {
           <CardTitle className="text-base">بار راهنمایی اساتید</CardTitle>
           <button onClick={csv} className="text-sm text-primary underline">خروجی CSV</button>
         </CardHeader>
-        <CardContent>
-          <Table>
+        <CardContent className="overflow-x-auto">
+          <Table className="min-w-[420px]">
             <TableHeader><TableRow><TableHead>استاد</TableHead><TableHead>در جریان</TableHead><TableHead>دفاع‌شده</TableHead><TableHead>ظرفیت پایه</TableHead></TableRow></TableHeader>
             <TableBody>
               {d.supervisors.map((s) => (

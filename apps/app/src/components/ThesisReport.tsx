@@ -97,13 +97,13 @@ export default function ThesisReport({ scope }: { scope: 'group_manager' | 'grad
           <div className="space-y-1.5"><Label className="text-xs">از تاریخ</Label><JalaliDatePicker value={f.dateFrom ? new Date(f.dateFrom) : undefined} onChange={(d) => set('dateFrom')(d?.toISOString())} /></div>
           <div className="space-y-1.5"><Label className="text-xs">تا تاریخ</Label><JalaliDatePicker value={f.dateTo ? new Date(f.dateTo) : undefined} onChange={(d) => set('dateTo')(d?.toISOString())} /></div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button onClick={() => run()} disabled={!!busy}>{busy === 'rows' ? <Loader2 className="ml-1 h-4 w-4 animate-spin" /> : <Search className="ml-1 h-4 w-4" />}اعمال فیلتر</Button>
           <Button variant="ghost" onClick={() => { setF({}); run({}); }}><RotateCcw className="ml-1 h-4 w-4" />پاک‌کردن</Button>
           {rows && <span className="mr-auto self-center text-sm text-muted-foreground">{fa(rows.length)} پرونده</span>}
         </div>
         <div className="overflow-x-auto rounded-lg border">
-          <Table>
+          <Table className="min-w-[720px]">
             <TableHeader><TableRow><TableHead>کد</TableHead><TableHead>عنوان</TableHead><TableHead>دانشجو</TableHead><TableHead>استاد</TableHead><TableHead>گروه</TableHead><TableHead>وضعیت</TableHead><TableHead>ثبت</TableHead></TableRow></TableHeader>
             <TableBody>
               {rows?.length === 0 && <TableRow><TableCell colSpan={7} className="py-10 text-center text-muted-foreground">پرونده‌ای با این فیلترها یافت نشد.</TableCell></TableRow>}

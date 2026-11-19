@@ -42,7 +42,7 @@ export default function JalaliDatePicker({ value, onChange, withTime, placeholde
           <CalendarDays className="h-4 w-4" />{value ? jalali(value.toISOString(), withTime) : placeholder}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-72 p-3" dir="rtl" align="start">
+      <PopoverContent className="w-[min(18rem,calc(100vw-1.5rem))] p-3" dir="rtl" align="start">
         <div className="mb-2 flex items-center justify-between">
           <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => shift(-1)} aria-label="ماه قبل"><ChevronRight className="h-4 w-4" /></Button>
           <div className="flex items-center gap-1 text-sm font-semibold">

@@ -34,7 +34,7 @@ export default function NotificationBell() {
           {data.unread > 0 && <span className="absolute -top-0.5 -left-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] text-destructive-foreground">{fa(Math.min(99, data.unread))}</span>}
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="end" className="w-80 p-0" dir="rtl">
+      <PopoverContent align="end" className="w-[calc(100vw-1.5rem)] p-0 sm:w-80" dir="rtl">
         <div className="flex items-center justify-between border-b px-3 py-2">
           <span className="text-sm font-semibold">اعلان‌ها</span>
           {data.unread > 0 && <Button variant="ghost" size="sm" onClick={() => { setData((d) => ({ unread: 0, items: d.items.map((x) => ({ ...x, isRead: true })) })); load({ markAll: true }); }}>خواندن همه</Button>}
